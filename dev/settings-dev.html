@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>设置 - 锦玉小手机</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #f5f0e6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'STKaiti', '楷体', 'KaiTi', serif;
+    transition: background 0.3s;
+}
+
+.phone-frame {
+    width: 320px;
+    height: 711px;
+    background: #000;
+    border-radius: 40px;
+    box-shadow: 0 0 0 10px #000, 0 30px 60px rgba(0,0,0,0.5);
+    overflow: hidden;
+    position: relative;
+    transition: all 0.3s;
+}
+
+.phone-screen {
+    width: 100%;
+    height: 100%;
+    background: #f5f1e8;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding-top: 40px;
+    position: relative;
+    box-sizing: border-box;
+}
+
+/* 顶部标题栏 */
+.header {
+    width: 100%;
+    height: 50px;
+    background: rgba(253, 250, 240, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 0 15px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    border-bottom: 0.5px solid rgba(212, 196, 166, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+/* 栀子花返回按钮 */
+.back-btn {
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: 0.2s;
+    padding: 0;
+}
+
+.back-btn:hover {
+    background: rgba(139, 115, 85, 0.1);
+}
+
+.gardenia {
+    position: relative;
+    width: 35px;
+    height: 35px;
+}
+
+.gardenia .petal {
+    position: absolute;
+    width: 9px;
+    height: 16px;
+    background: radial-gradient(circle at 50% 30%, #FFFCE8, #FFFFFF);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    transform-origin: bottom center;
+    top: 10px;
+    left: 13px;
+}
+
+.gardenia .petal:nth-child(1) { transform: rotate(-80deg); }
+.gardenia .petal:nth-child(2) { transform: rotate(-50deg); }
+.gardenia .petal:nth-child(3) { transform: rotate(-20deg); }
+.gardenia .petal:nth-child(4) { transform: rotate(20deg); }
+.gardenia .petal:nth-child(5) { transform: rotate(50deg); }
+
+.back-btn:hover .gardenia {
+    animation: rotate-gardenia 0.6s ease;
+}
+
+@keyframes rotate-gardenia {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-15deg); }
+}
+
+.header-title {
+    flex: 1;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: #5d534a;
+    letter-spacing: 3px;
+    margin-right: 40px;
+}
+
+/* 设置容器 */
+.settings-container {
+    width: 100%;
+    padding: 15px;
+    box-sizing: border-box;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* 隐藏默认滚动条 */
+.settings-container::-webkit-scrollbar {
+    width: 12px;
+    background: transparent;
+}
+
+.settings-container::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
+/* 功能卡片 */
+.envelope-card {
+    width: 100%;
+    margin: 0 0 12px 0;
+    padding: 15px;
+    box-sizing: border-box;
+    background: #FDFAF0;
+    border: 0.5px solid rgba(212, 196, 166, 0.2);
+    border-radius: 10px;
+    box-shadow: 
+        0 2px 4px rgba(139, 115, 85, 0.08),
+        0 4px 8px rgba(139, 115, 85, 0.06),
+        0 8px 16px rgba(139, 115, 85, 0.04);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background-image: 
+        linear-gradient(rgba(212,196,166,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(212,196,166,0.02) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+.envelope-card.expandable:hover {
+    transform: translateY(-4px);
+    box-shadow: 
+        0 4px 8px rgba(139, 115, 85, 0.12),
+        0 8px 16px rgba(139, 115, 85, 0.08),
+        0 16px 32px rgba(139, 115, 85, 0.06);
+}
+
+.envelope-card.expandable:hover .seal-area {
+    animation: swing 0.5s ease;
+}
+
+@keyframes swing {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+    75% { transform: rotate(-3deg); }
+}
+
+/* 印章区域 */
+.seal-area {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    background: rgba(139, 115, 85, 0.08);
+    border-radius: 50%;
+    border: 1px dashed rgba(212, 196, 166, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: rgba(139, 115, 85, 0.3);
+    transition: transform 0.3s ease;
+}
+
+/* 内容区 */
+.content-area {
+    flex: 1;
+}
+
+.title {
+    font-size: 15px;
+    color: #5d534a;
+    font-weight: 500;
+    margin-bottom: 3px;
+    letter-spacing: 1.5px;
+}
+
+.desc {
+    font-size: 12px;
+    color: #8b7355;
+    opacity: 0.8;
+    letter-spacing: 0.5px;
+}
+
+/* 春兰装饰区域 */
+.arrow-area {
+    width: 35px;
+    height: 35px;
+    min-width: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.spring-orchid {
+    position: relative;
+    width: 35px;
+    height: 35px;
+}
+
+.orchid-petal {
+    position: absolute;
+    width: 10px;
+    height: 13px;
+    background: radial-gradient(circle at 50% 20%, #E0F2D0, #FFFFFF);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    transform-origin: bottom center;
+    top: 11px;
+    left: 12.5px;
+}
+
+.orchid-petal:nth-child(1) { transform: rotate(0deg) translateY(-1px); }
+.orchid-petal:nth-child(2) { transform: rotate(72deg) translateY(-1px); }
+.orchid-petal:nth-child(3) { transform: rotate(144deg) translateY(-1px); }
+.orchid-petal:nth-child(4) { transform: rotate(216deg) translateY(-1px); }
+.orchid-petal:nth-child(5) { transform: rotate(288deg) translateY(-1px); }
+
+.envelope-card:hover .spring-orchid {
+    animation: rotate-spring 0.8s ease;
+}
+
+@keyframes rotate-spring {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(20deg); }
+}
+
+/* 有开关的卡片 */
+.envelope-card.has-switch {
+    cursor: default;
+}
+
+.envelope-card.has-switch:hover {
+    transform: none;
+}
+
+/* 开关样式 */
+.switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #d4c4a6;
+    transition: 0.3s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #8b7355;
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+/* 展开面板 */
+.detail-panel {
+    width: calc(100% - 52px);
+    margin: -5px 0 12px 52px;
+    padding: 12px;
+    box-sizing: border-box;
+    background: rgba(245, 241, 232, 0.6);
+    border-radius: 8px;
+    border-left: 2px solid #d4c4a6;
+    display: none;
+}
+
+.detail-panel.show {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.detail-panel input,
+.detail-panel select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 8px;
+    border: 1px solid #d4c4a6;
+    border-radius: 6px;
+    background: #fff;
+    font-family: 'STKaiti', '楷体', 'KaiTi', serif;
+    font-size: 13px;
+    color: #5d534a;
+    box-sizing: border-box;
+}
+
+.detail-panel button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 8px;
+    background: #8b7355;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-family: 'STKaiti', '楷体', 'KaiTi', serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+    letter-spacing: 1px;
+    box-sizing: border-box;
+}
+
+.detail-panel button:last-child {
+    margin-bottom: 0;
+}
+
+.detail-panel button:hover {
+    background: #9C8B7A;
+}
+
+.detail-panel button.danger {
+    background: #C97C5D;
+}
+
+.detail-panel button.danger:hover {
+    background: #B36B4D;
+}
+
+.detail-panel button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.detail-panel p {
+    font-size: 11px;
+    color: #8b7355;
+    margin: 5px 0 0 0;
+    text-align: center;
+}
+
+/* 回到顶部按钮 */
+.scroll-to-top {
+    position: fixed;
+    right: 15px;
+    bottom: 20px;
+    width: 50px;
+    height: 50px;
+    background: rgba(253, 250, 240, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(139, 115, 85, 0.2);
+    z-index: 300;
+}
+
+.scroll-to-top.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.scroll-to-top:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(139, 115, 85, 0.3);
+}
+
+.scroll-to-top .narcissus {
+    position: relative;
+    width: 35px;
+    height: 35px;
+}
+
+.scroll-to-top .narcissus .petal {
+    position: absolute;
+    width: 5px;
+    height: 14px;
+    background: radial-gradient(circle at 50% 30%, #FFFCE8, #FFFFFF);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    transform-origin: bottom center;
+    top: 10px;
+    left: 15px;
+}
+
+.scroll-to-top .narcissus .petal:nth-child(1) { transform: rotate(-30deg) translateY(-1px); }
+.scroll-to-top .narcissus .petal:nth-child(2) { transform: rotate(-15deg) translateY(-0.5px); }
+.scroll-to-top .narcissus .petal:nth-child(3) { transform: rotate(0deg); }
+.scroll-to-top .narcissus .petal:nth-child(4) { transform: rotate(15deg) translateY(-0.5px); }
+.scroll-to-top .narcissus .petal:nth-child(5) { transform: rotate(30deg) translateY(-1px); }
+.scroll-to-top .narcissus .petal:nth-child(6) { transform: rotate(0deg) translateY(-0.5px); }
+
+/* 黑夜模式 */
+body.dark-mode {
+    background: #2a2a2a;
+}
+
+body.dark-mode .phone-frame {
+    box-shadow: 0 0 0 10px #000, 0 30px 60px rgba(0,0,0,0.8);
+}
+
+body.dark-mode .phone-screen {
+    background: #1a1a1a;
+}
+
+body.dark-mode .header {
+    background: rgba(42, 42, 42, 0.95);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .header-title {
+    color: #e0e0e0;
+}
+
+body.dark-mode .back-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .gardenia .petal {
+    background: radial-gradient(circle at 50% 30%, #E0D8C0, #C0C0C0);
+}
+
+body.dark-mode .envelope-card {
+    background: #2a2a2a;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .title {
+    color: #e0e0e0;
+}
+
+body.dark-mode .desc {
+    color: #b0b0b0;
+}
+
+body.dark-mode .seal-area {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.3);
+}
+
+body.dark-mode .orchid-petal {
+    background: radial-gradient(circle at 50% 20%, #C0D8B0, #A0A0A0);
+}
+
+body.dark-mode .scroll-to-top {
+    background: rgba(42, 42, 42, 0.9);
+}
+
+body.dark-mode .scroll-to-top .narcissus .petal {
+    background: radial-gradient(circle at 50% 30%, #4A4A3A, #6A6A6A);
+}
+
+body.dark-mode .detail-panel {
+    background: rgba(42, 42, 42, 0.8);
+    border-left-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .detail-panel input,
+body.dark-mode .detail-panel select {
+    background: #1a1a1a;
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+}
+
+body.dark-mode .detail-panel button {
+    background: #5a5a5a;
+}
+
+body.dark-mode .detail-panel button:hover {
+    background: #6a6a6a;
+}
+
+body.dark-mode .detail-panel button.danger {
+    background: #8b4a3a;
+}
+
+body.dark-mode .detail-panel p {
+    color: #b0b0b0;
+}
+
+/* 全屏模式 */
+body.fullscreen-mode .phone-frame {
+    width: 100vw !important;
+    height: 100vh !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+</style>
+</head>
+<body>
+
+<!-- 手机外壳 -->
+<div class="phone-frame">
+    <!-- 手机屏幕 -->
+    <div class="phone-screen">
+        
+        <!-- 顶部标题栏 -->
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">
+                <div class="gardenia">
+                    <div class="petal"></div>
+                    <div class="petal"></div>
+                    <div class="petal"></div>
+                    <div class="petal"></div>
+                    <div class="petal"></div>
+                </div>
+            </button>
+            <div class="header-title">设置</div>
+        </div>
+        
+        <!-- 设置内容 -->
+        <div class="settings-container">
+            
+            <!-- 1. API设置（占位） -->
+            <div class="envelope-card expandable">
+                <div class="seal-area">⊙</div>
+                <div class="content-area">
+                    <div class="title">API设置</div>
+                    <div class="desc">配置AI接口（占位）</div>
+                </div>
+                <div class="arrow-area spring-orchid">
+                    <div class="orchid-petal"></div>
+                    <div class="orchid-petal"></div>
+                    <div class="orchid-petal"></div>
+                    <div class="orchid-petal"></div>
+                    <div class="orchid-petal"></div>
+                </div>
+            </div>
+            <div class="detail-panel">
+                <input type="text" placeholder="API Key" disabled>
+                <input type="text" placeholder="API 地址" disabled>
+                <select disabled>
+                    <option>模型选择</option>
+                </select>
+                <button disabled>测试连接</button>
+                <p>此功能暂未开放</p>
+            </div>
+
+            <!-- 2. 密码修改 -->
+            <div class="envelope-card expandable">
+                <div class="seal-area">⊙</div>
+                <div class="content-area">
+                    <div class="title">密码修改</div>
+                    <div class="desc">修改解锁密码</div>
+                </div>
+                <div class="arrow-area spring-orchid">
+                    <div class="orchid-petal"></div>
+                    <div class="orchid-petal"></div>
+                    <div class="orchid-petal"></div>
+                    <div class="orchid-petal"></div>
+                    <div class="orchid-petal"></div>
+                </div>
+            </div>
+            <div class="detail-panel">
+                <input type="password" id="oldPassword" placeholder="输入旧密码">
+                <input type="password" id="newPassword" placeholder="输入新密码">
+                <input type="password" id="confirmPassword" placeholder="再次确认">
+                <button onclick="changePassword()">保存密码</button>
+            </div>
+
+            <!-- 3. 全屏模式 -->
+            <div class="envelope-card has-switch">
+                <div class="seal-area">⊙</div>
+                <div class="content-area">
+                    <div class="title">全屏模式</div>
+                    <div class="desc">隐藏手机外壳</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="fullscreenSwitch">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <!-- 4. 系统模式 -->
+            <div class="envelope-card has-switch">
+                <div class="seal-area">⊙</div>
+                <div class="content-area">
+                    <div class="title">系统模式</div>
+                    <div class="desc">黑夜/白天主题</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="darkModeSwitch">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <!-- 5. 数据管理 -->
+            <div class="envelope-card expandable">
+                <div class="seal-area">⊙</div>
+                <div class="content-area">
+                    <div class="title">数据管理</div>
+                    <div class="desc">导入、导出或删除</div>
+                </div>
+                <div class="arrow-area spring-orchid">
+                    <div class="orchid-petal"></div>
+                    <div class="orchid-petal"></div>
+                    <div class="orchid-petal"></div>
+                    <div class="orchid-petal"></div>
+                    <div class="orchid-petal"></div>
+                </div>
+            </div>
+            <div class="detail-panel">
+                <button onclick="importData()">导入数据</button>
+                <button onclick="exportData()">导出数据</button>
+                <button onclick="deleteAllData()" class="danger">删除所有数据</button>
+                <input type="file" id="importFile" accept=".json" style="display:none;">
+            </div>
+
+            <!-- 6. 设置美化（占位） -->
+            <div class="envelope-card expandable">
+                <div class="seal-area">⊙</div>
+                <div class="content-area">
+                    <div class="title">设置美化</div>
+                    <div class="desc">壁纸和图标（占位）</div>
+                </div>
+                <div class="arrow-area spring-orchid">
+                    <div class="orchid-petal"></div>
+                    <div class="orchid-petal"></div>
+                    <div class="orchid-petal"></div>
+                    <div class="orchid-petal"></div>
+                    <div class="orchid-petal"></div>
+                </div>
+            </div>
+            <div class="detail-panel">
+                <button disabled>更换壁纸</button>
+                <button disabled>更换图标</button>
+                <p>此功能暂未开放</p>
+            </div>
+            
+        </div>
+        
+    </div>
+</div>
+
+<!-- 回到顶部按钮 -->
+<div class="scroll-to-top" id="scrollToTop">
+    <div class="narcissus">
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+    </div>
+</div>
+
+<script>
+// 1. 展开/收起
+document.querySelectorAll('.envelope-card.expandable').forEach(card => {card.addEventListener('click', function() {
+        const panel = this.nextElementSibling;
+        if (panel && panel.classList.contains('detail-panel')) {
+            if (panel.classList.contains('show')) {
+                panel.classList.remove('show');
+                setTimeout(() => panel.style.display = 'none', 300);
+            } else {
+                panel.style.display = 'block';
+                setTimeout(() => panel.classList.add('show'), 10);
+            }
+        }
+    });
+});
+
+// 2. 密码修改
+function changePassword() {
+    const oldPwd = document.getElementById('oldPassword').value;
+    const newPwd = document.getElementById('newPassword').value;
+    const confirmPwd = document.getElementById('confirmPassword').value;
+    
+    const currentPwd = localStorage.getItem('password') || '1234';
+    
+    if (!oldPwd || !newPwd || !confirmPwd) {
+        alert('请填写完整');
+        return;
+    }
+    
+    if (oldPwd !== currentPwd) {
+        alert('旧密码错误');
+        return;
+    }
+    
+    if (newPwd !== confirmPwd) {
+        alert('两次密码不一致');
+        return;
+    }
+    
+    if (newPwd.length !== 4 || !/^\d+$/.test(newPwd)) {
+        alert('密码必须是4位数字');
+        return;
+    }
+    
+    localStorage.setItem('password', newPwd);
+    alert('密码修改成功');
+    
+    document.getElementById('oldPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
+}
+
+// 3. 全屏模式
+document.getElementById('fullscreenSwitch').addEventListener('change', function() {
+    if (this.checked) {
+        document.body.classList.add('fullscreen-mode');
+        localStorage.setItem('fullscreen', 'true');
+    } else {
+        document.body.classList.remove('fullscreen-mode');
+        localStorage.setItem('fullscreen', 'false');
+    }
+});
+
+// 4. 黑夜模式
+document.getElementById('darkModeSwitch').addEventListener('change', function() {
+    if (this.checked) {
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('darkMode', 'true');
+    } else {
+        document.body.classList.remove('dark-mode');
+        localStorage.setItem('darkMode', 'false');
+    }
+});
+
+// 5. 导出数据
+function exportData() {
+    const data = {};
+    for (let key in localStorage) {
+        if (localStorage.hasOwnProperty(key)) {
+            data[key] = localStorage[key];
+        }
+    }
+    data.exportTime = new Date().toISOString();
+    
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '锦玉数据_' + new Date().toLocaleDateString().replace(/\//g, '-') + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    alert('数据导出成功');
+}
+
+// 6. 导入数据
+function importData() {
+    document.getElementById('importFile').click();
+}
+
+document.getElementById('importFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        try {
+            const data = JSON.parse(event.target.result);
+            
+            if (confirm('确定导入数据吗？当前设置将被覆盖')) {
+                for (let key in data) {
+                    if (key !== 'exportTime') {
+                        localStorage.setItem(key, data[key]);
+                    }
+                }
+                alert('导入成功，即将刷新页面');
+                location.reload();
+            }
+        } catch (err) {
+            alert('文件格式错误');
+        }
+    };
+    reader.readAsText(file);
+    
+    this.value = '';
+});
+
+// 7. 删除所有数据
+function deleteAllData() {
+    if (confirm('确定要删除所有数据吗？此操作不可恢复！')) {
+        if (confirm('再次确认：真的要删除吗？')) {
+            localStorage.clear();
+            alert('数据已清除，即将刷新页面');
+            location.reload();
+        }
+    }
+}
+
+// 8. 回到顶部按钮
+const scrollToTopBtn = document.getElementById('scrollToTop');
+const settingsContainer = document.querySelector('.settings-container');
+
+if (scrollToTopBtn && settingsContainer) {
+    // 监听滚动
+    settingsContainer.addEventListener('scroll', function() {
+        if (this.scrollTop > 100) {
+            scrollToTopBtn.classList.add('show');
+        } else {
+            scrollToTopBtn.classList.remove('show');
+        }
+    });
+    
+    // 点击回到顶部
+    scrollToTopBtn.addEventListener('click', function() {
+        settingsContainer.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}
+
+// 9. 页面加载时恢复设置
+window.addEventListener('load', function() {
+    // 恢复全屏模式
+    if (localStorage.getItem('fullscreen') === 'true') {
+        document.body.classList.add('fullscreen-mode');
+        document.getElementById('fullscreenSwitch').checked = true;
+    }
+    
+    // 恢复黑夜模式
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+        document.getElementById('darkModeSwitch').checked = true;
+    }
+});
+
+// 10. 返回按钮
+function goBack() {
+    window.history.back();
+}
+</script>
+
+</body>
+</html>

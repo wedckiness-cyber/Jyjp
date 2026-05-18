@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>锦玉音乐</title>
+    <link rel="stylesheet" href="https://unpkg.com/cropperjs@1.6.1/dist/cropper.css">
+    <link rel="stylesheet" href="../css/app-music.css">
+</head>
+<body>
+
+<div class="phone-screen">
+
+    <!-- ===== 播放器页面 ===== -->
+    <div class="main-page player-page" id="playerPage">
+
+        <!-- 封面区域 -->
+        <div class="player-section album-section">
+            <div class="avatar-wrapper">
+                <div class="avatar avatar-left" id="avatarLeft">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='35' height='35'%3E%3Crect fill='%23f5e6d3' width='35' height='35' rx='6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='KaiTi' font-size='10' fill='%238b7355'%3E角色%3C/text%3E%3C/svg%3E" alt="角色头像">
+                </div>
+
+                <svg class="red-thread" viewBox="0 0 290 80" preserveAspectRatio="none">
+                    <path class="thread-line" d="M 30 0 Q 50 20, 90 50" />
+                    <path class="thread-line" d="M 260 0 Q 240 20, 200 50" />
+                </svg>
+
+                <div class="avatar avatar-right" id="avatarRight">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='35' height='35'%3E%3Crect fill='%23e8d4b8' width='35' height='35' rx='6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='KaiTi' font-size='13' fill='%238b7355'%3E我%3C/text%3E%3C/svg%3E" alt="我的头像" id="avatarRightImg">
+                </div>
+            </div>
+
+            <div class="album-cover-container" id="coverContainer">
+                <div class="scroll-decoration top"></div>
+                <div class="album-cover">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110'%3E%3Crect fill='%23f5f1e8' width='110' height='110'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='KaiTi' font-size='10' fill='%238b7355'%3E点击上传%3C/text%3E%3C/svg%3E" alt="专辑封面" id="coverImage">
+                </div>
+                <div class="scroll-decoration bottom"></div>
+            </div>
+
+            <div class="song-title-box">
+                <span class="song-title-text" id="songTitleText">未选择歌曲</span>
+                <input type="text" class="song-title-input" id="songTitleInput" value="未选择歌曲">
+            </div>
+        </div>
+
+        <!-- 歌词区域 -->
+        <div class="player-section lyrics-section">
+            <button class="lyrics-import-btn" id="lyricsImportBtn">导入歌词</button>
+            <div class="lyrics-container" id="lyricsContainer">
+                <div class="lyrics-scroll" id="lyricsScroll">
+                    <div class="lyric-line">暂无歌词</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 控制区域 -->
+        <div class="player-section control-section">
+            <div class="progress-container">
+                <span class="time-current" id="currentTime">00:00</span>
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                    <div class="progress-handle" id="progressHandle"></div>
+                </div>
+                <span class="time-total" id="totalTime">00:00</span>
+            </div>
+
+            <div class="control-buttons">
+                <button class="control-flower playlist-flower" id="btnPlaylist">
+                    <div class="control-petal"></div>
+                    <div class="control-petal"></div>
+                    <div class="control-petal"></div>
+                    <div class="control-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z"/>
+                        </svg>
+                    </div>
+                </button>
+
+                <button class="play-flower" id="btnPlay">
+                    <div class="play-petal"></div>
+                    <div class="play-petal"></div>
+                    <div class="play-petal"></div>
+                    <div class="play-petal"></div>
+                    <div class="play-petal"></div>
+                    <div class="play-icon">
+                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                </button>
+
+                <button class="control-flower mode-flower mode-order" id="btnMode">
+                    <div class="control-petal"></div>
+                    <div class="control-petal"></div>
+                    <div class="control-petal"></div>
+                    <div class="control-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
+                        </svg>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+    </div>
+    <!-- ===== 个人主页页面 ===== -->
+    <div class="main-page profile-main-page" id="profileMainPage">
+
+        <!-- 个人主页 -->
+        <div class="profile-page" id="profilePage">
+            <div class="profile-scroll">
+
+                <!-- 个人信息 -->
+                <div class="profile-big-box">
+                    <div class="left-box" onclick="changeAvatar()">
+                        <div class="user-avatar">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect fill='%23e8d4b8' width='80' height='80' rx='8'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='KaiTi' font-size='26' fill='%238b7355'%3E我%3C/text%3E%3C/svg%3E" alt="用户头像" id="userAvatarImg">
+                        </div>
+                    </div>
+                    <div class="right-boxes">
+                        <div class="name-box" id="nameBox" ondblclick="editUsername()">
+                            <div class="user-name" id="userName">锦玉音乐家</div>
+                        </div>
+                        <div class="signature-box" id="signatureBox" ondblclick="editSignature()">
+                            <div class="user-signature" id="userSignature">点击编辑个性签名</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 荣誉墙 -->
+                <div class="honor-section">
+                    <div class="section-title-row">
+                        <span class="section-title">· 荣誉墙 ·</span>
+                        <span class="badge-status" onclick="openBadgeStats()" id="badgeStatusBtn">(2/6已解锁)</span>
+                    </div>
+                    <div class="honor-wall-compact">
+                        <div class="honor-badge-mini unlocked" data-badge-id="badge1" onclick="openBadgeEdit('badge1')">
+                            <div class="honor-badge-img-box">
+                                <img src="" alt="" class="badge-custom-img" id="badge1-img">
+                                <span class="badge-emoji">🎧</span>
+                            </div>
+                            <span class="badge-mini-name">听歌达人</span>
+                        </div>
+                        <div class="honor-badge-mini locked" data-badge-id="badge2" onclick="openBadgeEdit('badge2')">
+                            <div class="honor-badge-img-box">
+                                <img src="" alt="" class="badge-custom-img" id="badge2-img">
+                                <span class="badge-emoji">🎹</span>
+                            </div>
+                            <span class="badge-mini-name">音乐英才</span>
+                        </div>
+                        <div class="honor-badge-mini unlocked" data-badge-id="badge3" onclick="openBadgeEdit('badge3')">
+                            <div class="honor-badge-img-box">
+                                <img src="" alt="" class="badge-custom-img" id="badge3-img">
+                                <span class="badge-emoji">🌍</span>
+                            </div>
+                            <span class="badge-mini-name">英文歌</span>
+                        </div>
+                        <div class="honor-badge-mini locked" data-badge-id="badge4" onclick="openBadgeEdit('badge4')">
+                            <div class="honor-badge-img-box">
+                                <img src="" alt="" class="badge-custom-img" id="badge4-img">
+                                <span class="badge-emoji">🔍</span>
+                            </div>
+                            <span class="badge-mini-name">小众歌</span>
+                        </div>
+                        <div class="honor-badge-mini locked" data-badge-id="badge5" onclick="openBadgeEdit('badge5')">
+                            <div class="honor-badge-img-box">
+                                <img src="" alt="" class="badge-custom-img" id="badge5-img">
+                                <span class="badge-emoji">💔</span>
+                            </div>
+                            <span class="badge-mini-name">悲情歌手</span>
+                        </div>
+                        <div class="honor-badge-mini locked" data-badge-id="badge6" onclick="openBadgeEdit('badge6')">
+                            <div class="honor-badge-img-box">
+                                <img src="" alt="" class="badge-custom-img" id="badge6-img">
+                                <span class="badge-emoji">🎤</span>
+                            </div>
+                            <span class="badge-mini-name">K歌之王</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 我的歌单 -->
+                <div class="playlist-section">
+                    <div class="section-title-center">· 我的歌单 ·</div>
+                    <div class="playlists-grid" id="playlistsGrid">
+                        <div class="playlist-card" data-playlist-id="playlist1">
+                            <div class="playlist-cover-box" onclick="openPlaylistDetail('playlist1')">
+                                <img src="" alt="" class="playlist-cover" id="playlist1-cover">
+                                <div class="playlist-icon">❤️</div>
+                            </div>
+                            <div class="playlist-name">我喜欢</div>
+                        </div>
+                        <div class="playlist-card" data-playlist-id="playlist2">
+                            <div class="playlist-cover-box" onclick="openPlaylistDetail('playlist2')">
+                                <img src="" alt="" class="playlist-cover" id="playlist2-cover">
+                                <div class="playlist-icon">🎋</div>
+                            </div>
+                            <div class="playlist-name">古风精选</div>
+                        </div>
+                        <div class="playlist-card" data-playlist-id="playlist3">
+                            <div class="playlist-cover-box" onclick="openPlaylistDetail('playlist3')">
+                                <img src="" alt="" class="playlist-cover" id="playlist3-cover">
+                                <div class="playlist-icon">🌙</div>
+                            </div>
+                            <div class="playlist-name">夜听精选</div>
+                        </div>
+                        <div class="playlist-card">
+                            <div class="playlist-cover-box" onclick="createNewPlaylist()">
+                                <div class="playlist-icon" style="font-size:42px;">+</div>
+                            </div>
+                            <div class="playlist-name">新建歌单</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 歌单详情页 -->
+        <div class="playlist-detail-page" id="playlistDetailPage">
+            <div class="top-nav">
+                <button class="nav-btn" onclick="goBackToProfile()">✕ 返回</button>
+                <button class="nav-btn" onclick="openEditPlaylistModal()">✏️ 编辑</button>
+            </div>
+            <div class="playlist-header">
+                <div class="header-content">
+                    <div class="playlist-cover-detail" id="playlistCoverDetail">
+                        <img src="" alt="" id="detailCoverImg">
+                        <span class="detail-icon" id="detailIcon">❤️</span>
+                    </div>
+                    <div class="playlist-info">
+                        <div class="playlist-title" id="detailTitle">我喜欢</div>
+                        <div class="playlist-count" id="detailCount">0 首歌曲</div>
+                    </div>
+                </div>
+                <div class="playlist-desc" id="detailDesc">点击编辑按钮修改歌单信息</div>
+            </div>
+            <div class="action-buttons">
+                <button class="action-btn" onclick="openImportModal()">📂 导入</button>
+                <button class="action-btn" onclick="enterManageMode()">📝 管理</button>
+            </div>
+            <div class="song-list" id="songList">
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">🎵</div>
+                    <div class="empty-text">暂时还没有添加歌曲</div>
+                </div>
+                <div class="songs-container" id="songsContainer"></div>
+            </div>
+            <div class="manage-toolbar" id="manageToolbar">
+                <button class="toolbar-btn" onclick="selectAll()">全选</button>
+                <button class="toolbar-btn" onclick="exitManageMode()">取消</button>
+                <button class="toolbar-btn danger" id="deleteBtn" onclick="batchDelete()" disabled>删除(0)</button>
+                <button class="toolbar-btn" id="moveBtn" onclick="openMoveModal()" disabled>移动</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== 底部导航 ===== -->
+    <div class="bottom-nav">
+        <div class="nav-item active" id="navPlay" onclick="switchPage('play')">
+            <div class="nav-icon">
+                <div class="osmanthus">
+                    <div class="cluster"><div class="small-flower"></div><div class="small-flower"></div></div>
+                    <div class="cluster"><div class="small-flower"></div><div class="small-flower"></div></div>
+                    <div class="cluster"><div class="small-flower"></div><div class="small-flower"></div></div>
+                    <div class="cluster"><div class="small-flower"></div><div class="small-flower"></div></div>
+                    <div class="cluster"><div class="small-flower"></div><div class="small-flower"></div></div>
+                </div>
+            </div>
+            <div class="nav-text">进行时</div>
+        </div>
+        <div class="nav-item" id="navProfile" onclick="switchPage('profile')">
+            <div class="nav-icon">
+                <div class="profile-nav-icon"></div>
+            </div>
+            <div class="nav-text">个人主页</div>
+        </div>
+    </div>
+    <!-- ===== 播放器弹窗：选择歌单 ===== -->
+    <div class="playlist-modal" id="playlistModal" onclick="if(event.target.id==='playlistModal')closePlaylistModal()">
+        <div class="playlist-modal-box" onclick="event.stopPropagation()">
+            <div class="playlist-modal-title">选择歌单</div>
+            <div class="playlist-list" id="playlistListInModal"></div>
+            <div class="playlist-modal-buttons">
+                <button class="playlist-modal-btn" id="closePlaylistBtn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 播放器弹窗：歌曲列表 ===== -->
+    <div class="song-list-modal" id="songListModal" onclick="if(event.target.id==='songListModal')closeSongListModal()">
+        <div class="song-list-modal-box" onclick="event.stopPropagation()">
+            <div class="song-list-modal-title" id="songListTitle">歌单歌曲</div>
+            <div class="songs-list-container" id="songsListContainer"></div>
+            <div class="song-list-modal-buttons">
+                <button class="song-list-modal-btn" id="closeSongListBtn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 导入方式弹窗 ===== -->
+    <div class="modal-overlay" id="importModal" onclick="if(event.target.id==='importModal')closeImportModal()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-title">选择导入方式</div>
+            <button class="import-option-btn" onclick="importLocalMusic()">📂 本地音乐导入</button>
+            <button class="import-option-btn" onclick="importNeteasePlaylist()">🔗 网易云链接导入</button>
+            <button class="import-option-btn disabled" onclick="alert('功能开发中...')">🔗 QQ音乐链接导入 (开发中)</button>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeImportModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 移动歌曲弹窗 ===== -->
+    <div class="modal-overlay" id="moveModal" onclick="if(event.target.id==='moveModal')closeMoveModal()">
+        <div class="move-modal-box" onclick="event.stopPropagation()">
+            <div class="modal-title">移动到歌单</div>
+            <div class="move-modal-subtitle" id="moveSubtitle">已选中 0 首歌曲</div>
+            <div class="move-playlist-list" id="playlistListInMove"></div>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeMoveModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 荣誉墙统计弹窗 ===== -->
+    <div class="modal-overlay" id="badgeStatsModal" onclick="if(event.target.id==='badgeStatsModal')closeBadgeStats()">
+        <div class="badge-stats-box" onclick="event.stopPropagation()">
+            <div class="stats-title">🏅 荣誉墙统计</div>
+            <div class="stats-section">
+                <div class="stats-section-title">已解锁徽章</div>
+                <div id="unlockedBadgesList"></div>
+            </div>
+            <div class="stats-section">
+                <div class="stats-section-title">未解锁徽章</div>
+                <div id="lockedBadgesList"></div>
+            </div>
+            <button class="add-badge-btn" onclick="createNewBadge()">+ 自定义新徽章</button>
+            <button class="close-modal-btn" onclick="closeBadgeStats()">关闭</button>
+        </div>
+    </div>
+
+    <!-- ===== 徽章编辑弹窗 ===== -->
+    <div class="modal-overlay" id="badgeEditModal" onclick="if(event.target.id==='badgeEditModal')closeBadgeEdit()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-title" id="editTitle">编辑徽章</div>
+            <div class="badge-preview unlocked" id="badgePreview" onclick="changeBadgeImage()">
+                <img src="" alt="" id="badgePreviewImg" class="badge-preview-img">
+                <span class="badge-preview-emoji" id="badgePreviewEmoji">🎧</span>
+            </div>
+            <div class="upload-hint">点击上传自定义图片</div>
+            <div class="modal-group">
+                <label class="modal-label">徽章名称</label>
+                <input type="text" class="modal-input" id="inputName" value="听歌达人">
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">获得条件</label>
+                <textarea class="modal-input modal-textarea" id="inputCondition">累计听歌超过100首</textarea>
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">当前进度</label>
+                <input type="text" class="modal-input" id="inputProgress" value="150/100 首">
+            </div>
+            <div class="status-toggle">
+                <span class="toggle-label">状态</span>
+                <div class="toggle-switch active" id="toggleSwitch" onclick="toggleStatus()">
+                    <div class="toggle-knob"></div>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeBadgeEdit()">取消</button>
+                <button class="modal-btn modal-btn-save" onclick="saveBadgeEdit()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 新增徽章弹窗 ===== -->
+    <div class="modal-overlay" id="createBadgeModal" onclick="if(event.target.id==='createBadgeModal')closeCreateBadge()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-title">新增徽章</div>
+            <div class="badge-preview locked" id="newBadgePreview" onclick="changeNewBadgeImage()">
+                <img src="" alt="" id="newBadgePreviewImg" class="badge-preview-img">
+                <span class="badge-preview-emoji" id="newBadgePreviewEmoji">🎵</span>
+            </div>
+            <div class="upload-hint">点击上传自定义图片</div>
+            <div class="modal-group">
+                <label class="modal-label">徽章名称</label>
+                <input type="text" class="modal-input" id="newBadgeName" placeholder="请输入徽章名称">
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">徽章图标（emoji）</label>
+                <input type="text" class="modal-input" id="newBadgeEmoji" value="🎵">
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">获得条件</label>
+                <textarea class="modal-input modal-textarea" id="newBadgeCondition" placeholder="请输入获得条件"></textarea>
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">当前进度</label>
+                <input type="text" class="modal-input" id="newBadgeProgress" placeholder="如：0/100 首">
+            </div>
+            <div class="status-toggle">
+                <span class="toggle-label">状态</span>
+                <div class="toggle-switch" id="newBadgeToggle" onclick="toggleNewBadgeStatus()">
+                    <div class="toggle-knob"></div>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeCreateBadge()">取消</button>
+                <button class="modal-btn modal-btn-save" onclick="saveNewBadge()">创建</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 编辑用户名弹窗 ===== -->
+    <div class="modal-overlay" id="editNameModal" onclick="if(event.target.id==='editNameModal')closeUserEdit('name')">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-title">编辑用户名</div>
+            <input type="text" class="modal-input" id="editNameInput" placeholder="请输入用户名">
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeUserEdit('name')">取消</button>
+                <button class="modal-btn modal-btn-save" onclick="saveUsername()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 编辑个性签名弹窗 ===== -->
+    <div class="modal-overlay" id="editSigModal" onclick="if(event.target.id==='editSigModal')closeUserEdit('sig')">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-title">编辑个性签名</div>
+            <textarea class="modal-input modal-textarea" id="editSigInput" placeholder="请输入个性签名"></textarea>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeUserEdit('sig')">取消</button>
+                <button class="modal-btn modal-btn-save" onclick="saveSignature()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 新建歌单弹窗 ===== -->
+    <div class="modal-overlay" id="createPlaylistModal" onclick="if(event.target.id==='createPlaylistModal')closeCreatePlaylistModal()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-title">新建歌单</div>
+            <div class="modal-group">
+                <label class="modal-label">歌单封面（可选）</label>
+                <div class="cover-upload" id="newCoverUpload" onclick="changeNewCover()">
+                    <img src="" id="newCoverImg" alt="封面">
+                    <div class="upload-text">点击上传封面</div>
+                </div>
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">歌单名称</label>
+                <input type="text" class="modal-input" id="newTitleInput" placeholder="请输入歌单名称">
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">歌单介绍（可选）</label>
+                <textarea class="modal-input modal-textarea" id="newDescInput" placeholder="请输入歌单介绍"></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeCreatePlaylistModal()">取消</button>
+                <button class="modal-btn modal-btn-save" onclick="saveNewPlaylist()">创建</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 编辑歌单弹窗 ===== -->
+    <div class="modal-overlay" id="editPlaylistModal" onclick="if(event.target.id==='editPlaylistModal')closeEditPlaylistModal()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-title">编辑歌单</div>
+            <div class="modal-group">
+                <label class="modal-label">歌单封面</label>
+                <div class="cover-upload" id="editCoverUpload" onclick="changeEditCover()">
+                    <img src="" id="editCoverImg" alt="封面">
+                    <div class="upload-text">点击上传封面</div>
+                </div>
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">歌单名称</label>
+                <input type="text" class="modal-input" id="editTitleInput" placeholder="请输入歌单名称">
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">歌单介绍</label>
+                <textarea class="modal-input modal-textarea" id="editDescInput" placeholder="请输入歌单介绍"></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeEditPlaylistModal()">取消</button>
+                <button class="modal-btn" style="background:#ffcccc;color:#8b4545;" onclick="deletePlaylist()">删除</button>
+                <button class="modal-btn modal-btn-save" onclick="saveEditPlaylist()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 裁剪弹窗 ===== -->
+    <div class="crop-modal" id="cropModal">
+        <div class="crop-container">
+            <h3 class="crop-title">裁剪图片</h3>
+            <div class="crop-image-wrapper">
+                <img id="cropImage" src="" alt="待裁剪图片">
+            </div>
+            <div class="crop-buttons">
+                <button class="crop-btn crop-btn-cancel" onclick="closeCrop()">取消</button>
+                <button class="crop-btn crop-btn-confirm" onclick="confirmCrop()">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 隐藏文件上传 ===== -->
+    <input type="file" id="imageUpload" accept="image/*" style="display:none;">
+    <input type="file" id="musicUpload" accept="audio/*" multiple style="display:none;">
+    <input type="file" id="lrcUpload" accept=".lrc" style="display:none;">
+    <input type="file" id="coverUpload" accept="image/*" style="display:none;">
+    <input type="file" id="avatarUpload" accept="image/*" style="display:none;">
+
+
+    <script src="https://unpkg.com/cropperjs@1.6.1/dist/cropper.js"></script>
+    <script src="../js/app-music.js"></script>
+</body>
+</html>
