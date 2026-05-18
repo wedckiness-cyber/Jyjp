@@ -1,0 +1,2044 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+
+    <title>锦玉</title>
+<link rel="stylesheet" href="css/app-settings.css">
+<link rel="stylesheet" href="https://unpkg.com/cropperjs@1.6.1/dist/cropper.css">
+<link rel="stylesheet" href="css/app-music.css">
+
+<script src="js/app-settings.js"></script>
+
+
+    <style>
+
+    /* 去掉所有点击时的蓝色框框 */
+    * {
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-user-select: none;  /* 防止长按选中文字 */
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+    
+    /* 去掉按钮点击时的默认样式 */
+    button, a, div {
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        -webkit-touch-callout: none;  /* 防止长按弹出菜单 */
+    }
+
+        /* 1. 字體聲明 */
+        @font-face { font-family: 'Huiwen'; src: local('Huiwen Mingti'), local('匯文明朝體'), serif; }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            background: #f5f0e6; 
+            height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            font-family: 'STKaiti', '楷体', 'KaiTi', serif; 
+            overflow: hidden; 
+        }
+
+        /* 2. 核心容器：小米 14 比例 */
+        .phone-container {
+            width: 320px; height: 711px; background: #000; border-radius: 40px; position: relative; overflow: hidden;
+            box-shadow: 0 0 0 10px #000, 0 30px 60px rgba(0,0,0,0.5);
+        }
+        .wallpaper { position: absolute; inset: 0; background: linear-gradient(to bottom, #f5f1e8, #d4c4a6); background-size: cover; z-index: 1; }
+
+        /* 3. 核心動畫 */
+        .stop-anim { animation-play-state: paused !important; }
+        @keyframes steadyFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        @keyframes miniFloat3D { 0%, 100% { transform: rotateX(25deg) translateY(0); } 50% { transform: rotateX(25deg) translateY(-5px); } }
+
+        /* 4. 鎖屏佈局：容器改為絕對定位基準 */
+.lock-screen { position: absolute; inset: 0; z-index: 100; transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+.lock-screen.unlocked { transform: translateY(-100%); opacity: 0; }
+
+/* 锁屏时隐藏Dock和杏花 */
+.lock-screen ~ #homeScreen .dock-area,
+.lock-screen ~ #homeScreen .apricot-nav {
+    display: none !important;
+}
+
+
+        /* 🌟 歡迎語佈局：對標 test 版 12% 頂部距離 */
+        .welcome-layout { 
+            position: absolute; 
+            top: 12%; 
+            width: 85%; 
+            left: 7.5%; 
+            z-index: 100; 
+        }
+        .welcome-card {
+            background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px);
+            padding: 20px 15px; border-radius: 20px; text-align: center;
+            border: 1px solid rgba(139, 115, 85, 0.2);
+            animation: steadyFloat 4s ease-in-out infinite;
+        }
+        .welcome-line { cursor: pointer; color: #4a3c32; }
+        .edit-input { width: 100%; background: #fdfaf0; border: 1px solid #d4c4a6; border-radius: 8px; font-family: inherit; font-size: 20px; text-align: center; color: #4a3c32; display: none; outline: none; }
+
+        /* 3D 迷你小本子 */
+        .notebook-wrapper { position: absolute; width: 60px; height: 45px; perspective: 500px; z-index: 110; }
+        .notebook-left { left: -10px; top: -30px; }
+        .notebook-right { right: -10px; bottom: -30px; }
+        .mini-notebook { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transform: rotateX(25deg); animation: miniFloat3D 4s ease-in-out infinite; }
+        .book-wing { position: absolute; top: 0; width: 50%; height: 100%; background: #fffef5; border: 0.5px solid #e8dfc4; }
+        .wing-left { left: 0; border-radius: 2px 0 0 2px; transform-origin: right center; transform: rotateY(15deg); }
+        .wing-right { right: 0; border-radius: 0 2px 2px 0; transform-origin: left center; transform: rotateY(-15deg); }
+        .page-stack { position: absolute; inset: 0; background: #fffef5; transform: translateZ(-2px); box-shadow: 0 1px 0 #ede6d1, 0 2px 0 #d4c4a6; }
+
+        /* 🌟 密碼區佈局：對標 test 版 52% 中間距離 */
+        .center-lock-area { 
+            position: absolute; 
+            top: 52%; 
+            width: 100%; 
+            height: 80px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 100; 
+        }
+        .dots-row { display: flex; gap: 20px; padding: 0 15px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid #8b7355; transition: 0.2s; }
+        .dot.filled { background: #8b7355; transform: scale(1.3); }
+        .dot.error { background: #ff6b6b !important; border-color: #ff6b6b !important; }
+        .shake { animation: shakeAnim 0.4s; }
+        @keyframes shakeAnim { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 50% { transform: translateX(10px); } }
+
+        /* 貓爪 */
+        .cat-paw-svg { width: 50px; height: 50px; animation: steadyFloat 4s ease-in-out infinite; cursor: pointer; }
+        .paw-left { transform: rotate(-10deg); }
+        .paw-right { transform: scaleX(-1) rotate(-10deg); }
+        .gold-paw { fill: url(#goldGrad); filter: drop-shadow(2px 3px 4px rgba(139, 115, 85, 0.3)); }
+
+        /* 菜單彈出框 */
+        .option-popup {
+            position: absolute; background: #fdfaf0; border: 1px solid #d4c4a6; border-radius: 50px;
+            padding: 10px 20px; display: none; flex-direction: row; gap: 12px; z-index: 500;
+            box-shadow: 0 5px 15px rgba(139, 115, 85, 0.2);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .option-item { font-size: 14px; color: #8b7355; cursor: pointer; padding: 5px 10px; }
+
+        /* 🌟 鍵盤佈局：對標 test 版 bottom 60px 沉底 */
+        .keypad-frame { 
+            position: absolute; 
+            bottom: 60px; 
+            width: 100%; 
+            display: flex; 
+            justify-content: center; 
+            z-index: 100; 
+        }
+        .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 280px; animation: steadyFloat 4s ease-in-out infinite; }
+        .key {
+            width: 60px; height: 60px; background: rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(139, 115, 85, 0.2); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; color: #5d534a; cursor: pointer;
+            font-family: 'STKaiti', '楷体', serif; 
+        }
+        .key:active { background: #d4c4a6; transform: scale(0.9); }
+        .key.special { font-size: 14px; color: #8b7355; font-weight: bold; }
+       #homeScreen { 
+    position: absolute; 
+    inset: 0; 
+    background: #f5f1e8;
+    z-index: 50; 
+    display: none; 
+    overflow: hidden;
+    font-family: 'STKaiti', '楷体', 'KaiTi', serif;
+}
+
+/* 双屏容器基础样式 */
+.screen-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.screen {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: opacity 0.35s ease;
+    background: transparent;
+
+}
+
+.left-screen {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 10;
+}
+
+.left-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.right-screen {
+    opacity: 0;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.right-screen.active {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 20;
+}
+
+/* ========== 左屏内容样式 ========== */
+.left-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* 窗：196×124，距顶127px（缩放后） */
+.left-window {
+    position: absolute;
+    top: 127px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 196px;
+    height: 124px;
+    border: 2px solid #8b7355;
+    border-radius: 4px;
+    background-color: #f5f1e8;
+}
+
+.window-panel {
+    width: 180px;
+    height: 40px;
+    background-color: #d4c4a6;
+    border-radius: 2px;
+    margin: 15px auto 0;
+    opacity: 0.8;
+}
+
+.window-pole {
+    position: absolute;
+    bottom: 25px;
+    right: 10px;
+    width: 30px;
+    height: 2px;
+    background-color: #8b7355;
+    transform: rotate(45deg);
+    transform-origin: right center;
+}
+
+.window-text {
+    position: absolute;
+    bottom: 8px;
+    width: 100%;
+    text-align: center;
+    font-size: 14px;
+    color: #5d534a;
+    font-family: 'STKaiti', '楷体', 'KaiTi', serif;
+    letter-spacing: 2px;
+}
+
+/* 窗台线 */
+.windowsill {
+    position: absolute;
+    top: 237px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 1px;
+    background-color: #d4c4a6;
+}
+
+/* 胭脂盒+花瓶容器 */
+.left-decor {
+    position: absolute;
+    top: 456px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 30px;
+    width: auto;
+}
+
+/* 胭脂盒：52×52 + 文字 */
+.cosmetic-box {
+    width: 52px;
+    height: 68px;
+    background-color: transparent;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    cursor: pointer;
+}
+
+/* 花瓶：52×52 + 文字 */
+.vase {
+    width: 52px;
+    height: 68px;
+    background-color: transparent;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    cursor: pointer;
+}
+
+/* 左屏图标方块 */
+.left-icon-shape {
+    width: 52px;
+    height: 52px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(139, 115, 85, 0.2);
+    border-radius: 12px;
+    margin-bottom: 4px;
+    transition: 0.2s;
+}
+
+.left-icon-shape:hover {
+    background-color: rgba(212, 196, 166, 0.3);
+}
+
+/* 左屏图标文字 */
+.left-icon-text {
+    font-size: 12px;
+    color: #5d534a;
+    font-family: 'STKaiti', '楷体', 'KaiTi', serif;
+    letter-spacing: 1px;
+}
+/* ========== 窗影 + 时辰/时间切换 ========== */
+.window-shadow {
+    position: absolute;
+    top: 270px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 50px;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(139, 115, 85, 0.25) 0%,
+        rgba(139, 115, 85, 0.15) 40%,
+        rgba(139, 115, 85, 0.05) 70%,
+        transparent 100%
+    );
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.7s ease;
+    z-index: 2;
+}
+
+.window-shadow.visible {
+    display: flex;
+    opacity: 0;
+    animation: fadeInShadow 0.7s forwards;
+}
+
+/* 现代模式时窗影加深 */
+.window-shadow.modern-time-mode {
+    background: radial-gradient(
+        ellipse at center,
+        rgba(139, 115, 85, 0.35) 0%,
+        rgba(139, 115, 85, 0.22) 40%,
+        rgba(139, 115, 85, 0.08) 70%,
+        transparent 100%
+    );
+}
+
+@keyframes fadeInShadow {
+    to { opacity: 1; }
+}
+
+/* 时辰/时间显示基础样式 */
+.time-display {
+    font-family: 'STKaiti', '楷体', 'KaiTi', serif;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+/* 古代时辰样式 - 小字淡色朦胧 */
+.time-display.ancient-mode {
+    font-size: 12px;
+    color: rgba(139, 69, 19, 0.6);
+    letter-spacing: 1px;
+}
+
+.time-display.ancient-mode:hover {
+    color: rgba(139, 69, 19, 0.8);
+}
+
+/* 现代时间样式 - 大字深色清晰 */
+.time-display.modern-mode {
+    font-size: 16px;
+    font-weight: 600;
+    color: #5d534a;
+    letter-spacing: 2px;
+    text-shadow: 
+        0 0 3px rgba(255, 255, 255, 0.8),
+        0 1px 2px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.6);
+    padding: 4px 10px;
+    border-radius: 12px;
+    backdrop-filter: blur(3px);
+}
+
+.time-display.modern-mode:hover {
+    color: #4a3c32;
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.75);
+}
+
+
+ /* ========== 窗户样式（象牙白窗框 + 纸糊窗扇） ========== */
+.window-frame-home {
+    position: absolute;
+    top: 127px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 196px;
+    height: 124px;
+}
+
+/* 象牙白窗框四边 - 温润磨砂感 */
+.window-frame-home .top-frame, 
+.window-frame-home .bottom-frame, 
+.window-frame-home .left-frame, 
+.window-frame-home .right-frame {
+    position: absolute;
+    background: linear-gradient(145deg, #F0EBE1, #E8DFC4);
+    box-shadow: 
+        inset 0 2px 5px rgba(139, 115, 85, 0.08),
+        inset -1px -1px 3px rgba(139, 115, 85, 0.05),
+        0 1px 2px rgba(0, 0, 0, 0.03);
+    z-index: 5;
+}
+
+.window-frame-home .top-frame {
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 24px;
+    border-radius: 3px 3px 0 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.window-frame-home .bottom-frame {
+    bottom: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 24px;
+    border-radius: 0 0 3px 3px;
+}
+
+.window-frame-home .left-frame {
+    top: 0; 
+    left: 0; 
+    width: 24px; 
+    height: 100%;
+    border-radius: 3px 0 0 3px;
+    border-left: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.window-frame-home .right-frame {
+    top: 0; 
+    right: 0; 
+    width: 24px; 
+    height: 100%;
+    border-radius: 0 3px 3px 0;
+}
+
+/* 角色图片显示区域 */
+.character-area {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    width: 148px;
+    height: 76px;
+    z-index: 3;
+    overflow: hidden;
+    border-radius: 2px;
+}
+
+.character-area img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ===== 纸糊窗扇（可推开）===== */
+.window-frame-home .window-pane {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    width: 148px;
+    height: 76px;
+    
+    /* 推开动画 */
+    transform-origin: top center;
+    transform: rotateX(0deg);
+    transition: transform 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+    z-index: 10;
+}
+
+.window-frame-home .window-pane.turning {
+    transform: rotateX(-45deg);
+}
+
+/* 窗纸层（底层，凹进去）*/
+.window-frame-home .window-paper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    
+    background-color: #FDF5E6;
+    
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(139, 115, 85, 0.02) 2px,
+            rgba(139, 115, 85, 0.02) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(139, 115, 85, 0.02) 2px,
+            rgba(139, 115, 85, 0.02) 4px
+        ),
+        radial-gradient(
+            ellipse at 30% 40%,
+            rgba(255, 255, 255, 0.3),
+            transparent 50%
+        ),
+        radial-gradient(
+            ellipse at 70% 60%,
+            rgba(250, 240, 220, 0.4),
+            transparent 60%
+        );
+    
+    opacity: 0.85;
+    
+    box-shadow: 
+        inset 0 2px 4px rgba(139, 115, 85, 0.12),
+        inset 0 -1px 3px rgba(255, 255, 255, 0.3);
+    
+    border-radius: 2px;
+}
+
+/* 窗格木条层（上层，凸起）*/
+.window-frame-home .window-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 15;
+    pointer-events: none;
+}
+
+/* 横向木条（2条）*/
+.window-frame-home .window-grid::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    background-image: 
+        linear-gradient(
+            to bottom,
+            transparent calc(33.33% - 2px),
+            #A99B8A calc(33.33% - 2px),
+            #9C8B7A 33.33%,
+            #8E7D6C calc(33.33% + 2px),
+            transparent calc(33.33% + 2px)
+        ),
+        linear-gradient(
+            to bottom,
+            transparent calc(66.66% - 2px),
+            #A99B8A calc(66.66% - 2px),
+            #9C8B7A 66.66%,
+            #8E7D6C calc(66.66% + 2px),
+            transparent calc(66.66% + 2px)
+        );
+    
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2))
+            drop-shadow(0 -0.5px 1px rgba(255, 255, 255, 0.4));
+}
+
+/* 竖向木条（2条）*/
+.window-frame-home .window-grid::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    background-image: 
+        linear-gradient(
+            to right,
+            transparent calc(33.33% - 2px),
+            #A99B8A calc(33.33% - 2px),
+            #9C8B7A 33.33%,
+            #8E7D6C calc(33.33% + 2px),
+            transparent calc(33.33% + 2px)
+        ),
+        linear-gradient(
+            to right,
+            transparent calc(66.66% - 2px),
+            #A99B8A calc(66.66% - 2px),
+            #9C8B7A 66.66%,
+            #8E7D6C calc(66.66% + 2px),
+            transparent calc(66.66% + 2px)
+        );
+    
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2))
+            drop-shadow(-0.5px 0 1px rgba(255, 255, 255, 0.4));
+}
+
+/* 折枝小花 */
+.window-frame-home .flower-branch {
+    position: absolute;
+    bottom: -12px;
+    right: -12px;
+    width: 55px;
+    height: 70px;
+    transform: scaleX(-1);
+    z-index: 50;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.window-frame-home .flower-branch:hover {
+    transform: scaleX(-1) scale(1.05);
+}
+
+.window-frame-home .branch {
+    position: absolute;
+    bottom: 0;
+    left: 16px;
+    width: 2px;
+    height: 48px;
+    background: #6B4E3A;
+    transform: rotate(-8deg);
+    transform-origin: bottom;
+    border-radius: 1px;
+    box-shadow: 0 0 0 1px rgba(100,70,40,0.2);
+}
+
+.window-frame-home .twig {
+    position: absolute;
+    bottom: 24px;
+    left: 16px;
+    width: 1.5px;
+    height: 20px;
+    background: #6B4E3A;
+    transform: rotate(25deg);
+    transform-origin: bottom;
+    border-radius: 1px;
+}
+
+.window-frame-home .flower1 {
+    position: absolute;
+    bottom: 40px;
+    left: 13px;
+    width: 8px;
+    height: 8px;
+    background: #E8D3C7;
+    border-radius: 60% 40% 50% 50%;
+    transform: rotate(-15deg);
+    box-shadow: 0 0 0 1px rgba(180,130,110,0.2);
+}
+
+.window-frame-home .flower1::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 3px;
+    height: 3px;
+    background: #D4A59A;
+    border-radius: 50%;
+    opacity: 0.5;
+}
+
+.window-frame-home .flower2 {
+    position: absolute;
+    bottom: 28px;
+    left: 8px;
+    width: 10px;
+    height: 10px;
+    background: #F2DAD0;
+    border-radius: 50% 40% 50% 40%;
+    transform: rotate(10deg);
+    box-shadow: 0 0 0 1px rgba(200,150,130,0.3);
+}
+
+.window-frame-home .flower2::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 3px;
+    height: 3px;
+    background: #C97C5D;
+    border-radius: 50%;
+}
+
+.window-frame-home .flower3 {
+    position: absolute;
+    bottom: 52px;
+    left: 17px;
+    width: 6px;
+    height: 6px;
+    background: #E0BCB0;
+    border-radius: 50% 50% 40% 40%;
+    transform: rotate(5deg);
+}
+
+.window-frame-home .leaf {
+    position: absolute;
+    bottom: 36px;
+    left: 17px;
+    width: 6px;
+    height: 3px;
+    background: #9C7C5B;
+    border-radius: 80% 0 50% 20%;
+    transform: rotate(35deg);
+    opacity: 0.6;
+}
+
+.window-frame-home .leaf2 {
+    position: absolute;
+    bottom: 20px;
+    left: 14px;
+    width: 6px;
+    height: 3px;
+    background: #9C7C5B;
+    border-radius: 0 80% 20% 50%;
+    transform: rotate(-20deg);
+    opacity: 0.6;
+}
+
+/* ========== 右屏内容样式 ========== */
+.right-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* 右屏小窗：50×60 */
+.right-window {
+    position: absolute;
+    top: 55px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 60px;
+    border: 0.5px solid #d4c4a6;
+    border-radius: 4px;
+    background-color: rgba(245, 241, 232, 0.7);
+}
+
+.right-window-panel {
+    width: 40px;
+    height: 18px;
+    background-color: rgba(212, 196, 166, 0.5);
+    border-radius: 2px;
+    margin: 8px auto 0;
+}
+
+.right-window-pole {
+    position: absolute;
+    bottom: 18px;
+    right: 5px;
+    width: 18px;
+    height: 1px;
+    background-color: #8b7355;
+    transform: rotate(45deg);
+}
+
+.right-window-text {
+    position: absolute;
+    bottom: 6px;
+    width: 100%;
+    text-align: center;
+    font-size: 10px;
+    color: rgba(93, 83, 74, 0.5);
+    font-family: 'STKaiti', '楷体', 'KaiTi', serif;
+}
+
+/* 图标组容器 */
+.icon-group {
+    display: flex;
+    gap: 20px;
+    position: absolute;
+}
+
+/* 图标项 */
+.icon-item {
+    width: 52px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+
+/* 图标方块 */
+.icon-shape {
+    width: 52px;
+    height: 52px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(139, 115, 85, 0.2);
+    border-radius: 12px;
+    transition: 0.2s;
+}
+
+.icon-shape:hover {
+    background-color: rgba(212, 196, 166, 0.3);
+}
+
+/* 图标文字 */
+.icon-text {
+    font-size: 12px;
+    color: #5d534a;
+    font-family: 'STKaiti', '楷体', 'KaiTi', serif;
+    margin-top: 8px;
+    letter-spacing: 1px;
+}
+
+/* 三组图标位置：按比例缩放 */
+.group1 {
+    top: 182px;
+    left: 10%;
+}
+
+.group2 {
+    top: 310px;
+    right: 10%;
+}
+
+.group3 {
+    top: 456px;
+    left: 10%;
+}
+
+/* 窗影诗句 */
+.shadow-poem {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: #b7a99a;
+    font-family: 'STKaiti', '楷体', 'KaiTi', serif;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+/* ========== 切屏按钮 ========== */
+.nav-buttons {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 30px;
+    z-index: 50;
+}
+
+.nav-btn {
+    width: 70px;
+    height: 36px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(139, 115, 85, 0.2);
+    border-radius: 30px;
+    color: #5d534a;
+    font-size: 14px;
+    font-family: 'STKaiti', '楷体', 'KaiTi', serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    transition: all 0.2s;
+}
+
+.nav-btn:hover {
+    background-color: rgba(212, 196, 166, 0.4);
+    color: #4a3c32;
+}
+
+.nav-btn:active {
+    transform: scale(0.96);
+}
+
+/* ========== 大信封容器样式 ========== */
+#app-overlay {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.5);  /* 改成跟标题栏一样的颜色 */
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+    flex-direction: column;
+    padding-top: 0px; 
+    box-sizing: border-box;
+}
+
+#app-overlay.active {
+    display: flex !important;
+}
+
+
+#app-overlay .app-content { padding: 0; overflow: hidden; height: 100%; }
+#app-music { width: 100%; height: 100%; }
+
+
+.app-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.5);
+    position: relative;
+}
+
+
+.app-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    font-family: 'STKaiti', '楷体', 'KaiTi', serif;
+}
+
+.close-btn {
+    position: absolute;
+    left: 20px;
+    width: 60px;
+    height: 60px;
+    border: none !important;        /* 加 !important 强制去边框 */
+    border-radius: 50% !important;  /* 加 !important 强制圆形 */
+    background: rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    outline: none !important;       /* 加 !important 强制去黑边 */
+}
+
+.close-btn .gardenia {
+    position: relative;
+    width: 36px;
+    height: 36px;
+}
+
+
+.close-btn .petal {
+    position: absolute;
+    width: 20px;
+    height: 32px;
+    background: radial-gradient(circle at 50% 30%, #FFFCE8, #FFFFFF);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    transform-origin: bottom center;
+    top: 50%;
+    left: 50%;
+    margin-top: -15px;
+    margin-left: -9px;
+}
+
+
+
+/* 花瓣完全展开角度 */
+.close-btn .petal:nth-child(1) { transform: rotate(-80deg); }
+.close-btn .petal:nth-child(2) { transform: rotate(-50deg); }
+.close-btn .petal:nth-child(3) { transform: rotate(-20deg); }
+.close-btn .petal:nth-child(4) { transform: rotate(20deg); }
+.close-btn .petal:nth-child(5) { transform: rotate(50deg); }
+
+
+.close-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.close-btn:active {
+    transform: scale(0.9);
+}
+
+.app-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    font-family: 'STKaiti', '楷体', 'KaiTi', serif;
+}
+/* ========== 杏花导航按钮 ========== */
+.apricot-nav {
+    position: absolute;
+    bottom: 100px;
+    left: 50%; 
+    margin-left: 70px;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    z-index: 600;
+    transition: 0.3s;
+    opacity: 0;
+    transform: scale(0);
+    pointer-events: none;
+}
+
+
+/* 锁屏显示时强制隐藏杏花 */
+.lock-screen[style*="display: flex"] ~ #homeScreen .apricot-nav {
+    display: none !important;
+}
+
+
+
+
+.apricot-nav.show {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+    animation: popInFlower 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popInFlower {
+    0% { transform: scale(0) rotate(-90deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+.apricot-nav:hover {
+    transform: scale(1.05);
+}
+
+.apricot-nav:active {
+    transform: scale(0.95);
+}
+
+.apricot-nav .flower {
+    position: relative;
+    width: 50px;
+    height: 50px;
+}
+
+.apricot-nav .petal {
+    position: absolute;
+    width: 18px;
+    height: 26px;
+    background: radial-gradient(circle at 50% 20%, #FFE4E1, #FFFFFF);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    transform-origin: bottom center;
+    top: 12px;
+    left: 16px;
+}
+
+.apricot-nav .petal:nth-child(1) { transform: rotate(0deg) translateY(-5px);}
+.apricot-nav .petal:nth-child(2) { transform: rotate(72deg) translateY(-5px);}
+.apricot-nav .petal:nth-child(3) { transform: rotate(144deg) translateY(-5px);}
+.apricot-nav .petal:nth-child(4) { transform: rotate(216deg) translateY(-5px);}
+.apricot-nav .petal:nth-child(5) { transform: rotate(288deg) translateY(-5px);}
+
+.apricot-nav.clicked {
+    animation: bloomFlower 0.5s ease;
+}
+
+@keyframes bloomFlower {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+/* 底部 Dock 区域 */
+.dock-area {
+    position: absolute;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 280px;
+    height: 50px;
+    z-index: 500;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 25px;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Dock内诗句显示 */
+.dock-poem {
+    font-size: 12px;
+    color: #8b7355;
+    font-family: 'STKaiti', '楷体', 'KaiTi', serif;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: color 0.2s;
+    user-select: none;
+}
+
+.dock-poem:hover {
+    color: #5d534a;
+}
+
+/* Dock内诗句编辑输入框 */
+.dock-poem-input {
+    width: 240px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #d4c4a6;
+    border-radius: 15px;
+    font-family: 'STKaiti', '楷体', 'KaiTi', serif;
+    font-size: 12px;
+    text-align: center;
+    color: #5d534a;
+    outline: none;
+    padding: 0 10px;
+}
+
+
+/* 锁屏显示时强制隐藏Dock */
+.lock-screen[style*="display: flex"] ~ #homeScreen .dock-area {
+    display: none !important;
+}
+
+
+
+/* 确保窗户小花在上层 */
+.window-frame-home .flower-branch {
+    z-index: 150 !important;
+}
+
+/* 隐藏丑按钮 */
+.nav-buttons {
+    display: none !important;
+}
+
+
+#app-overlay .app-header {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 20px !important;
+    min-height: auto !important;
+    padding-top: 20px !important;
+}
+
+
+    </style>
+</head>
+<body>
+<div class="phone-container">
+    <div class="wallpaper"></div>
+    
+    <!-- 控制菜單 -->
+    <div class="option-popup" id="leftMenu" style="top: 45%; left: 15px;">
+        <div class="option-item" id="optBook">書本</div>
+        <div class="option-item" id="optPaw">貓爪</div>
+    </div>
+    <div class="option-popup" id="rightMenu" style="top: 45%; right: 15px;">
+        <div class="option-item" id="optInput">輸入框</div>
+        <div class="option-item" id="optKeypad">鍵盤</div>
+    </div>
+
+    <div class="lock-screen" id="lockScreen">
+        <!-- 1. 歡迎語佈局 (12% 頂部) -->
+        <div class="welcome-layout">
+            <div class="notebook-wrapper notebook-left"><div class="mini-notebook" id="nbLeft"><div class="page-stack"></div><div class="book-wing wing-left"></div><div class="book-wing wing-right"></div></div></div>
+            <div class="welcome-card" id="welcomeCard">
+                <div id="welcomeMain" class="welcome-line" style="font-size: 26px; letter-spacing: 4px; margin-bottom: 5px;">欢迎使用</div>
+                <input type="text" class="edit-input" id="inputMain">
+                <div id="welcomeSub" class="welcome-line" style="font-size: 20px; opacity: 0.8; letter-spacing: 2px;">锦玉小手机</div>
+                <input type="text" class="edit-input" id="inputSub">
+            </div>
+            <div class="notebook-wrapper notebook-right"><div class="mini-notebook" id="nbRight" style="animation-delay: 0.5s;"><div class="page-stack"></div><div class="book-wing wing-left"></div><div class="book-wing wing-right"></div></div></div>
+        </div>
+
+        <!-- 2. 密碼區 (52% 中間) -->
+        <div class="center-lock-area">
+            <svg class="cat-paw-svg paw-left" id="leftPaw" viewBox="0 0 60 60">
+                <defs><linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#8b7355;" /><stop offset="50%" style="stop-color:#f5f0e6;" /><stop offset="100%" style="stop-color:#d4c4a6;" /></linearGradient></defs>
+                <g class="gold-paw"><ellipse cx="30" cy="45" rx="18" ry="15" /><ellipse cx="12" cy="28" rx="6" ry="8" transform="rotate(-20, 12, 28)" /><ellipse cx="24" cy="20" rx="6" ry="9" /><ellipse cx="38" cy="20" rx="6" ry="9" /><ellipse cx="50" cy="28" rx="6" ry="8" transform="rotate(20, 50, 28)" /></g>
+            </svg>
+            <div class="dots-row" id="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            <svg class="cat-paw-svg paw-right" id="rightPaw" viewBox="0 0 60 60">
+                <g class="gold-paw"><ellipse cx="30" cy="45" rx="18" ry="15" /><ellipse cx="12" cy="28" rx="6" ry="8" transform="rotate(-20, 12, 28)" /><ellipse cx="24" cy="20" rx="6" ry="8" /><ellipse cx="38" cy="20" rx="6" ry="8" /><ellipse cx="50" cy="28" rx="6" ry="8" transform="rotate(20, 50, 28)" /></g>
+            </svg>
+        </div>
+
+        <!-- 3. 鍵盤 (bottom 60px 沉底) -->
+        <div class="keypad-frame">
+            <div class="keypad" id="mainKeypad">
+                <div class="key" onclick="press('1')">壹</div><div class="key" onclick="press('2')">貳</div><div class="key" onclick="press('3')">叁</div><div class="key special" onclick="press('D')">刪除</div>
+                <div class="key" onclick="press('4')">肆</div><div class="key" onclick="press('5')">伍</div><div class="key" onclick="press('6')">陸</div><div class="key special" onclick="press('C')">重置</div>
+                <div class="key" onclick="press('7')">柒</div><div class="key" onclick="press('8')">捌</div><div class="key" onclick="press('9')">玖</div><div class="key" onclick="press('0')">零</div>
+            </div>
+        </div>
+    </div>
+    <div id="homeScreen">
+        <div class="screen-container">
+            <!-- 左屏 -->
+            <div class="screen left-screen" id="leftScreen">
+                <div class="left-content">
+                 <!-- 窗户（集成自 window.html） -->
+               <!-- 窗户（象牙白窗框 + 纸糊窗扇） -->
+<div class="window-frame-home">
+    <!-- 象牙白窗框 -->
+    <div class="top-frame"></div>
+    <div class="bottom-frame"></div>
+    <div class="left-frame"></div>
+    <div class="right-frame"></div>
+    
+    <!-- 角色图片显示区域 -->
+    <div class="character-area">
+        <img id="characterImg" src="" alt="角色" style="display: none;">
+    </div>
+    
+    <!-- 纸糊窗扇（可推开） -->
+    <div class="window-pane" id="windowPane">
+        <div class="window-paper"></div>
+        <div class="window-grid"></div>
+    </div>
+
+    <!-- 折枝小花 - 右下角，点它推开窗 -->
+    <div class="flower-branch" id="flowerBtnHome">
+        <div class="branch"></div>
+        <div class="twig"></div>
+        <div class="flower1"></div>
+        <div class="flower2"></div>
+        <div class="flower3"></div>
+        <div class="leaf"></div>
+        <div class="leaf2"></div>
+    </div>
+</div>
+
+                    
+                    <!-- 窗台线 -->
+                    <div class="windowsill"></div>
+                    
+                    <!-- 胭脂盒 + 花瓶 -->
+                    <div class="left-decor">
+                        <div class="cosmetic-box" onclick="openApp('settings', '设置')">
+                            <div class="left-icon-shape"></div>
+                            <span class="left-icon-text">设置</span>
+                        </div>
+                        <div class="vase" onclick="openApp('theme', '美化')">
+                            <div class="left-icon-shape"></div>
+                            <span class="left-icon-text">美化</span>
+                        </div>
+                    </div>
+                    
+                   
+                 <!-- 窗影 + 时辰显示 -->
+<div class="window-shadow" id="windowShadow">
+    <div class="time-display" id="timeDisplay" onclick="toggleTimeMode()">未时初刻</div>
+</div>
+
+
+                </div>
+            </div>
+
+            <!-- 右屏 -->
+            <div class="screen right-screen" id="rightScreen">
+                <div class="right-content">
+                    <!-- 小窗 -->
+                    <div class="right-window">
+                        <div class="right-window-panel"></div>
+                        <div class="right-window-pole"></div>
+                        <div class="right-window-text">窗</div>
+                    </div>
+                    
+                    <!-- 第一组图标：左上 -->
+                    <div class="icon-group group1">
+                        <div class="icon-item" onclick="openApp('online', '联机')">
+                            <div class="icon-shape"></div>
+                            <div class="icon-text">联机</div>
+                        </div>
+                        <div class="icon-item" onclick="openApp('study', '学习')">
+                            <div class="icon-shape"></div>
+                            <div class="icon-text">学习</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 第二组图标：中右 -->
+                    <div class="icon-group group2">
+                        <div class="icon-item" onclick="openApp('worldbook', '世界书')">
+                            <div class="icon-shape"></div>
+                            <div class="icon-text">世界书</div>
+                        </div>
+                        <div class="icon-item" onclick="openApp('chat', '聊天')">
+                            <div class="icon-shape"></div>
+                            <div class="icon-text">聊天</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 第三组图标：左下 -->
+                    <div class="icon-group group3">
+                        <div class="icon-item" onclick="openApp('farm', '农场')">
+                            <div class="icon-shape"></div>
+                            <div class="icon-text">农场</div>
+                        </div>
+                        <div class="icon-item" onclick="openApp('music', '音乐')">
+                            <div class="icon-shape"></div>
+                            <div class="icon-text">音乐</div>
+                        </div>
+                    </div>
+                    
+                   
+                </div>
+            </div>
+            
+                          </div>
+            </div>
+            
+        </div> <!-- screen-container结束 -->
+            
+        <!-- 杏花导航按钮 -->
+        <div class="apricot-nav" id="apricotNav">
+            <div class="flower">
+                <div class="petal"></div>
+                <div class="petal"></div>
+                <div class="petal"></div>
+                <div class="petal"></div>
+                <div class="petal"></div>
+            </div>
+        </div>
+
+               <!-- 底部 Dock 区域（双击召唤杏花） -->
+        <div class="dock-area" id="dockArea">
+            <div class="dock-poem" id="dockPoem">杏花吹满头，谁家年少。</div>
+            <input type="text" class="dock-poem-input" id="dockPoemInput" style="display: none;">
+        </div>
+
+
+    </div> <!-- homeScreen结束 -->
+
+
+
+<!-- ========== 大信封容器 ========== -->
+<div id="app-overlay">
+    <div class="app-header">
+      <button class="close-btn" onclick="closeApp()">
+    <div class="gardenia">
+        <div class="petal" style="transform: rotate(-80deg);"></div>
+        <div class="petal" style="transform: rotate(-50deg);"></div>
+        <div class="petal" style="transform: rotate(-20deg);"></div>
+        <div class="petal" style="transform: rotate(20deg);"></div>
+        <div class="petal" style="transform: rotate(50deg);"></div>
+    </div>
+</button>
+
+
+
+
+        <span class="app-title">应用名称</span>
+    </div>
+<div class="app-content">
+    
+    <!-- 设置应用 -->
+    <div id="app-settings" style="display:none;">
+        
+        <!-- 1. API设置 -->
+        <div class="settings-card expandable" onclick="togglePanel(this)">
+            <div class="settings-seal">⊙</div>
+            <div class="settings-content">
+                <div class="settings-title">API设置</div>
+                <div class="settings-desc">配置AI接口（占位）</div>
+            </div>
+            <div class="settings-arrow spring-orchid">
+                <div class="orchid-petal"></div>
+                <div class="orchid-petal"></div>
+                <div class="orchid-petal"></div>
+                <div class="orchid-petal"></div>
+                <div class="orchid-petal"></div>
+            </div>
+        </div>
+        <div class="settings-panel">
+            <input type="text" placeholder="API Key" disabled>
+            <input type="text" placeholder="API 地址" disabled>
+            <select disabled>
+                <option>模型选择</option>
+            </select>
+            <button disabled>测试连接</button>
+            <p>此功能暂未开放</p>
+        </div>
+
+        <!-- 2. 密码修改 -->
+        <div class="settings-card expandable" onclick="togglePanel(this)">
+            <div class="settings-seal">⊙</div>
+            <div class="settings-content">
+                <div class="settings-title">密码修改</div>
+                <div class="settings-desc">修改解锁密码</div>
+            </div>
+            <div class="settings-arrow spring-orchid">
+                <div class="orchid-petal"></div>
+                <div class="orchid-petal"></div>
+                <div class="orchid-petal"></div>
+                <div class="orchid-petal"></div>
+                <div class="orchid-petal"></div>
+            </div>
+        </div>
+        <div class="settings-panel">
+            <input type="password" id="oldPassword" placeholder="输入旧密码">
+            <input type="password" id="newPassword" placeholder="输入新密码">
+            <input type="password" id="confirmPassword" placeholder="再次确认">
+            <button onclick="changePassword()">保存密码</button>
+        </div>
+
+        <!-- 3. 全屏模式 -->
+        <div class="settings-card has-switch">
+            <div class="settings-seal">⊙</div>
+            <div class="settings-content">
+                <div class="settings-title">全屏模式</div>
+                <div class="settings-desc">隐藏手机外壳</div>
+            </div>
+            <label class="settings-switch">
+                <input type="checkbox" id="fullscreenSwitch">
+                <span class="settings-slider"></span>
+            </label>
+        </div>
+
+        <!-- 4. 系统模式 -->
+        <div class="settings-card has-switch">
+            <div class="settings-seal">⊙</div>
+            <div class="settings-content">
+                <div class="settings-title">系统模式</div>
+                <div class="settings-desc">黑夜/白天主题</div>
+            </div>
+            <label class="settings-switch">
+                <input type="checkbox" id="darkModeSwitch">
+                <span class="settings-slider"></span>
+            </label>
+        </div>
+
+        <!-- 5. 锁屏密码 -->
+        <div class="settings-card has-switch">
+            <div class="settings-seal">⊙</div>
+            <div class="settings-content">
+                <div class="settings-title">锁屏密码</div>
+                <div class="settings-desc">关闭后直接进入主屏</div>
+            </div>
+            <label class="settings-switch">
+                <input type="checkbox" id="lockScreenSwitch" checked>
+                <span class="settings-slider"></span>
+            </label>
+        </div>
+
+        <!-- 6. 数据管理 -->
+        <div class="settings-card expandable" onclick="togglePanel(this)">
+            <div class="settings-seal">⊙</div>
+            <div class="settings-content">
+                <div class="settings-title">数据管理</div>
+                <div class="settings-desc">导入、导出或删除</div>
+            </div>
+            <div class="settings-arrow spring-orchid">
+                <div class="orchid-petal"></div>
+                <div class="orchid-petal"></div>
+                <div class="orchid-petal"></div>
+                <div class="orchid-petal"></div>
+                <div class="orchid-petal"></div>
+            </div>
+        </div>
+        <div class="settings-panel">
+            <button onclick="importData()">导入数据</button>
+            <button onclick="exportData()">导出数据</button>
+            <button onclick="deleteAllData()" class="danger">删除所有数据</button>
+            <input type="file" id="importFile" accept=".json" style="display:none;" onchange="handleImportFile(event)">
+        </div>
+
+        <!-- 7. 设置美化 -->
+        <div class="settings-card expandable" onclick="togglePanel(this)">
+            <div class="settings-seal">⊙</div>
+            <div class="settings-content">
+                <div class="settings-title">设置美化</div>
+                <div class="settings-desc">壁纸和图标（占位）</div>
+            </div>
+            <div class="settings-arrow spring-orchid">
+                <div class="orchid-petal"></div>
+                <div class="orchid-petal"></div>
+                <div class="orchid-petal"></div>
+                <div class="orchid-petal"></div>
+                <div class="orchid-petal"></div>
+            </div>
+        </div>
+        <div class="settings-panel">
+            <button disabled>更换壁纸</button>
+            <button disabled>更换图标</button>
+            <p>此功能暂未开放</p>
+        </div>
+        
+    </div>
+    <!-- 设置应用结束 -->
+    
+    <!-- 其他应用占位 -->
+    <div id="app-chat" style="display:none;">
+        <p style="text-align:center; margin-top:50px; color:#8b7355;">聊天功能尚未开发</p>
+    </div>
+    
+    <div id="app-online" style="display:none;">
+        <p style="text-align:center; margin-top:50px; color:#8b7355;">联机功能尚未开发</p>
+    </div>
+    
+    <div id="app-study" style="display:none;">
+        <p style="text-align:center; margin-top:50px; color:#8b7355;">学习功能尚未开发</p>
+    </div>
+    
+    <div id="app-worldbook" style="display:none;">
+        <p style="text-align:center; margin-top:50px; color:#8b7355;">世界书功能尚未开发</p>
+    </div>
+    
+    <div id="app-farm" style="display:none;">
+        <p style="text-align:center; margin-top:50px; color:#8b7355;">农场功能尚未开发</p>
+    </div>
+    
+    <div id="app-music" style="display:none;">
+        <div class="phone-screen">
+
+    <!-- ===== 播放器页面 ===== -->
+    <div class="main-page player-page" id="playerPage">
+
+        <!-- 封面区域 -->
+        <div class="player-section album-section">
+            <div class="avatar-wrapper">
+                <div class="avatar avatar-left" id="avatarLeft">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='35' height='35'%3E%3Crect fill='%23f5e6d3' width='35' height='35' rx='6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='KaiTi' font-size='10' fill='%238b7355'%3E角色%3C/text%3E%3C/svg%3E" alt="角色头像">
+                </div>
+
+                <svg class="red-thread" viewBox="0 0 290 80" preserveAspectRatio="none">
+                    <path class="thread-line" d="M 30 0 Q 50 20, 90 50" />
+                    <path class="thread-line" d="M 260 0 Q 240 20, 200 50" />
+                </svg>
+
+                <div class="avatar avatar-right" id="avatarRight">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='35' height='35'%3E%3Crect fill='%23e8d4b8' width='35' height='35' rx='6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='KaiTi' font-size='13' fill='%238b7355'%3E我%3C/text%3E%3C/svg%3E" alt="我的头像" id="avatarRightImg">
+                </div>
+            </div>
+
+            <div class="album-cover-container" id="coverContainer">
+                <div class="scroll-decoration top"></div>
+                <div class="album-cover">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110'%3E%3Crect fill='%23f5f1e8' width='110' height='110'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='KaiTi' font-size='10' fill='%238b7355'%3E点击上传%3C/text%3E%3C/svg%3E" alt="专辑封面" id="coverImage">
+                </div>
+                <div class="scroll-decoration bottom"></div>
+            </div>
+
+            <div class="song-title-box">
+                <span class="song-title-text" id="songTitleText">未选择歌曲</span>
+                <input type="text" class="song-title-input" id="songTitleInput" value="未选择歌曲">
+            </div>
+        </div>
+
+        <!-- 歌词区域 -->
+        <div class="player-section lyrics-section">
+            <button class="lyrics-import-btn" id="lyricsImportBtn">导入歌词</button>
+            <div class="lyrics-container" id="lyricsContainer">
+                <div class="lyrics-scroll" id="lyricsScroll">
+                    <div class="lyric-line">暂无歌词</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 控制区域 -->
+        <div class="player-section control-section">
+            <div class="progress-container">
+                <span class="time-current" id="currentTime">00:00</span>
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                    <div class="progress-handle" id="progressHandle"></div>
+                </div>
+                <span class="time-total" id="totalTime">00:00</span>
+            </div>
+
+            <div class="control-buttons">
+                <button class="control-flower playlist-flower" id="btnPlaylist">
+                    <div class="control-petal"></div>
+                    <div class="control-petal"></div>
+                    <div class="control-petal"></div>
+                    <div class="control-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z"/>
+                        </svg>
+                    </div>
+                </button>
+
+                <button class="play-flower" id="btnPlay">
+                    <div class="play-petal"></div>
+                    <div class="play-petal"></div>
+                    <div class="play-petal"></div>
+                    <div class="play-petal"></div>
+                    <div class="play-petal"></div>
+                    <div class="play-icon">
+                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                </button>
+
+                <button class="control-flower mode-flower mode-order" id="btnMode">
+                    <div class="control-petal"></div>
+                    <div class="control-petal"></div>
+                    <div class="control-petal"></div>
+                    <div class="control-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
+                        </svg>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+    </div>
+    <!-- ===== 个人主页页面 ===== -->
+    <div class="main-page profile-main-page" id="profileMainPage">
+
+        <!-- 个人主页 -->
+        <div class="profile-page" id="profilePage">
+            <div class="profile-scroll">
+
+                <!-- 个人信息 -->
+                <div class="profile-big-box">
+                    <div class="left-box" onclick="changeAvatar()">
+                        <div class="user-avatar">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect fill='%23e8d4b8' width='80' height='80' rx='8'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='KaiTi' font-size='26' fill='%238b7355'%3E我%3C/text%3E%3C/svg%3E" alt="用户头像" id="userAvatarImg">
+                        </div>
+                    </div>
+                    <div class="right-boxes">
+                        <div class="name-box" id="nameBox" ondblclick="editUsername()">
+                            <div class="user-name" id="userName">锦玉音乐家</div>
+                        </div>
+                        <div class="signature-box" id="signatureBox" ondblclick="editSignature()">
+                            <div class="user-signature" id="userSignature">点击编辑个性签名</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 荣誉墙 -->
+                <div class="honor-section">
+                    <div class="section-title-row">
+                        <span class="section-title">· 荣誉墙 ·</span>
+                        <span class="badge-status" onclick="openBadgeStats()" id="badgeStatusBtn">(2/6已解锁)</span>
+                    </div>
+                    <div class="honor-wall-compact">
+                        <div class="honor-badge-mini unlocked" data-badge-id="badge1" onclick="openBadgeEdit('badge1')">
+                            <div class="honor-badge-img-box">
+                                <img src="" alt="" class="badge-custom-img" id="badge1-img">
+                                <span class="badge-emoji">🎧</span>
+                            </div>
+                            <span class="badge-mini-name">听歌达人</span>
+                        </div>
+                        <div class="honor-badge-mini locked" data-badge-id="badge2" onclick="openBadgeEdit('badge2')">
+                            <div class="honor-badge-img-box">
+                                <img src="" alt="" class="badge-custom-img" id="badge2-img">
+                                <span class="badge-emoji">🎹</span>
+                            </div>
+                            <span class="badge-mini-name">音乐英才</span>
+                        </div>
+                        <div class="honor-badge-mini unlocked" data-badge-id="badge3" onclick="openBadgeEdit('badge3')">
+                            <div class="honor-badge-img-box">
+                                <img src="" alt="" class="badge-custom-img" id="badge3-img">
+                                <span class="badge-emoji">🌍</span>
+                            </div>
+                            <span class="badge-mini-name">英文歌</span>
+                        </div>
+                        <div class="honor-badge-mini locked" data-badge-id="badge4" onclick="openBadgeEdit('badge4')">
+                            <div class="honor-badge-img-box">
+                                <img src="" alt="" class="badge-custom-img" id="badge4-img">
+                                <span class="badge-emoji">🔍</span>
+                            </div>
+                            <span class="badge-mini-name">小众歌</span>
+                        </div>
+                        <div class="honor-badge-mini locked" data-badge-id="badge5" onclick="openBadgeEdit('badge5')">
+                            <div class="honor-badge-img-box">
+                                <img src="" alt="" class="badge-custom-img" id="badge5-img">
+                                <span class="badge-emoji">💔</span>
+                            </div>
+                            <span class="badge-mini-name">悲情歌手</span>
+                        </div>
+                        <div class="honor-badge-mini locked" data-badge-id="badge6" onclick="openBadgeEdit('badge6')">
+                            <div class="honor-badge-img-box">
+                                <img src="" alt="" class="badge-custom-img" id="badge6-img">
+                                <span class="badge-emoji">🎤</span>
+                            </div>
+                            <span class="badge-mini-name">K歌之王</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 我的歌单 -->
+                <div class="playlist-section">
+                    <div class="section-title-center">· 我的歌单 ·</div>
+                    <div class="playlists-grid" id="playlistsGrid">
+                        <div class="playlist-card" data-playlist-id="playlist1">
+                            <div class="playlist-cover-box" onclick="openPlaylistDetail('playlist1')">
+                                <img src="" alt="" class="playlist-cover" id="playlist1-cover">
+                                <div class="playlist-icon">❤️</div>
+                            </div>
+                            <div class="playlist-name">我喜欢</div>
+                        </div>
+                        <div class="playlist-card" data-playlist-id="playlist2">
+                            <div class="playlist-cover-box" onclick="openPlaylistDetail('playlist2')">
+                                <img src="" alt="" class="playlist-cover" id="playlist2-cover">
+                                <div class="playlist-icon">🎋</div>
+                            </div>
+                            <div class="playlist-name">古风精选</div>
+                        </div>
+                        <div class="playlist-card" data-playlist-id="playlist3">
+                            <div class="playlist-cover-box" onclick="openPlaylistDetail('playlist3')">
+                                <img src="" alt="" class="playlist-cover" id="playlist3-cover">
+                                <div class="playlist-icon">🌙</div>
+                            </div>
+                            <div class="playlist-name">夜听精选</div>
+                        </div>
+                        <div class="playlist-card">
+                            <div class="playlist-cover-box" onclick="createNewPlaylist()">
+                                <div class="playlist-icon" style="font-size:42px;">+</div>
+                            </div>
+                            <div class="playlist-name">新建歌单</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 歌单详情页 -->
+        <div class="playlist-detail-page" id="playlistDetailPage">
+            <div class="top-nav">
+                <button class="nav-btn" onclick="goBackToProfile()">✕ 返回</button>
+                <button class="nav-btn" onclick="openEditPlaylistModal()">✏️ 编辑</button>
+            </div>
+            <div class="playlist-header">
+                <div class="header-content">
+                    <div class="playlist-cover-detail" id="playlistCoverDetail">
+                        <img src="" alt="" id="detailCoverImg">
+                        <span class="detail-icon" id="detailIcon">❤️</span>
+                    </div>
+                    <div class="playlist-info">
+                        <div class="playlist-title" id="detailTitle">我喜欢</div>
+                        <div class="playlist-count" id="detailCount">0 首歌曲</div>
+                    </div>
+                </div>
+                <div class="playlist-desc" id="detailDesc">点击编辑按钮修改歌单信息</div>
+            </div>
+            <div class="action-buttons">
+                <button class="action-btn" onclick="openImportModal()">📂 导入</button>
+                <button class="action-btn" onclick="enterManageMode()">📝 管理</button>
+            </div>
+            <div class="song-list" id="songList">
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">🎵</div>
+                    <div class="empty-text">暂时还没有添加歌曲</div>
+                </div>
+                <div class="songs-container" id="songsContainer"></div>
+            </div>
+            <div class="manage-toolbar" id="manageToolbar">
+                <button class="toolbar-btn" onclick="selectAll()">全选</button>
+                <button class="toolbar-btn" onclick="exitManageMode()">取消</button>
+                <button class="toolbar-btn danger" id="deleteBtn" onclick="batchDelete()" disabled>删除(0)</button>
+                <button class="toolbar-btn" id="moveBtn" onclick="openMoveModal()" disabled>移动</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== 底部导航 ===== -->
+    <div class="bottom-nav">
+        <div class="nav-item active" id="navPlay" onclick="switchPage('play')">
+            <div class="nav-icon">
+                <div class="osmanthus">
+                    <div class="cluster"><div class="small-flower"></div><div class="small-flower"></div></div>
+                    <div class="cluster"><div class="small-flower"></div><div class="small-flower"></div></div>
+                    <div class="cluster"><div class="small-flower"></div><div class="small-flower"></div></div>
+                    <div class="cluster"><div class="small-flower"></div><div class="small-flower"></div></div>
+                    <div class="cluster"><div class="small-flower"></div><div class="small-flower"></div></div>
+                </div>
+            </div>
+            <div class="nav-text">进行时</div>
+        </div>
+        <div class="nav-item" id="navProfile" onclick="switchPage('profile')">
+            <div class="nav-icon">
+                <div class="profile-nav-icon"></div>
+            </div>
+            <div class="nav-text">个人主页</div>
+        </div>
+    </div>
+    <!-- ===== 播放器弹窗：选择歌单 ===== -->
+    <div class="playlist-modal" id="playlistModal" onclick="if(event.target.id==='playlistModal')closePlaylistModal()">
+        <div class="playlist-modal-box" onclick="event.stopPropagation()">
+            <div class="playlist-modal-title">选择歌单</div>
+            <div class="playlist-list" id="playlistListInModal"></div>
+            <div class="playlist-modal-buttons">
+                <button class="playlist-modal-btn" id="closePlaylistBtn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 播放器弹窗：歌曲列表 ===== -->
+    <div class="song-list-modal" id="songListModal" onclick="if(event.target.id==='songListModal')closeSongListModal()">
+        <div class="song-list-modal-box" onclick="event.stopPropagation()">
+            <div class="song-list-modal-title" id="songListTitle">歌单歌曲</div>
+            <div class="songs-list-container" id="songsListContainer"></div>
+            <div class="song-list-modal-buttons">
+                <button class="song-list-modal-btn" id="closeSongListBtn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 导入方式弹窗 ===== -->
+    <div class="modal-overlay" id="importModal" onclick="if(event.target.id==='importModal')closeImportModal()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-title">选择导入方式</div>
+            <button class="import-option-btn" onclick="importLocalMusic()">📂 本地音乐导入</button>
+            <button class="import-option-btn" onclick="importNeteasePlaylist()">🔗 网易云链接导入</button>
+            <button class="import-option-btn disabled" onclick="alert('功能开发中...')">🔗 QQ音乐链接导入 (开发中)</button>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeImportModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 移动歌曲弹窗 ===== -->
+    <div class="modal-overlay" id="moveModal" onclick="if(event.target.id==='moveModal')closeMoveModal()">
+        <div class="move-modal-box" onclick="event.stopPropagation()">
+            <div class="modal-title">移动到歌单</div>
+            <div class="move-modal-subtitle" id="moveSubtitle">已选中 0 首歌曲</div>
+            <div class="move-playlist-list" id="playlistListInMove"></div>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeMoveModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 荣誉墙统计弹窗 ===== -->
+    <div class="modal-overlay" id="badgeStatsModal" onclick="if(event.target.id==='badgeStatsModal')closeBadgeStats()">
+        <div class="badge-stats-box" onclick="event.stopPropagation()">
+            <div class="stats-title">🏅 荣誉墙统计</div>
+            <div class="stats-section">
+                <div class="stats-section-title">已解锁徽章</div>
+                <div id="unlockedBadgesList"></div>
+            </div>
+            <div class="stats-section">
+                <div class="stats-section-title">未解锁徽章</div>
+                <div id="lockedBadgesList"></div>
+            </div>
+            <button class="add-badge-btn" onclick="createNewBadge()">+ 自定义新徽章</button>
+            <button class="close-modal-btn" onclick="closeBadgeStats()">关闭</button>
+        </div>
+    </div>
+
+    <!-- ===== 徽章编辑弹窗 ===== -->
+    <div class="modal-overlay" id="badgeEditModal" onclick="if(event.target.id==='badgeEditModal')closeBadgeEdit()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-title" id="editTitle">编辑徽章</div>
+            <div class="badge-preview unlocked" id="badgePreview" onclick="changeBadgeImage()">
+                <img src="" alt="" id="badgePreviewImg" class="badge-preview-img">
+                <span class="badge-preview-emoji" id="badgePreviewEmoji">🎧</span>
+            </div>
+            <div class="upload-hint">点击上传自定义图片</div>
+            <div class="modal-group">
+                <label class="modal-label">徽章名称</label>
+                <input type="text" class="modal-input" id="inputName" value="听歌达人">
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">获得条件</label>
+                <textarea class="modal-input modal-textarea" id="inputCondition">累计听歌超过100首</textarea>
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">当前进度</label>
+                <input type="text" class="modal-input" id="inputProgress" value="150/100 首">
+            </div>
+            <div class="status-toggle">
+                <span class="toggle-label">状态</span>
+                <div class="toggle-switch active" id="toggleSwitch" onclick="toggleStatus()">
+                    <div class="toggle-knob"></div>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeBadgeEdit()">取消</button>
+                <button class="modal-btn modal-btn-save" onclick="saveBadgeEdit()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 新增徽章弹窗 ===== -->
+    <div class="modal-overlay" id="createBadgeModal" onclick="if(event.target.id==='createBadgeModal')closeCreateBadge()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-title">新增徽章</div>
+            <div class="badge-preview locked" id="newBadgePreview" onclick="changeNewBadgeImage()">
+                <img src="" alt="" id="newBadgePreviewImg" class="badge-preview-img">
+                <span class="badge-preview-emoji" id="newBadgePreviewEmoji">🎵</span>
+            </div>
+            <div class="upload-hint">点击上传自定义图片</div>
+            <div class="modal-group">
+                <label class="modal-label">徽章名称</label>
+                <input type="text" class="modal-input" id="newBadgeName" placeholder="请输入徽章名称">
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">徽章图标（emoji）</label>
+                <input type="text" class="modal-input" id="newBadgeEmoji" value="🎵">
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">获得条件</label>
+                <textarea class="modal-input modal-textarea" id="newBadgeCondition" placeholder="请输入获得条件"></textarea>
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">当前进度</label>
+                <input type="text" class="modal-input" id="newBadgeProgress" placeholder="如：0/100 首">
+            </div>
+            <div class="status-toggle">
+                <span class="toggle-label">状态</span>
+                <div class="toggle-switch" id="newBadgeToggle" onclick="toggleNewBadgeStatus()">
+                    <div class="toggle-knob"></div>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeCreateBadge()">取消</button>
+                <button class="modal-btn modal-btn-save" onclick="saveNewBadge()">创建</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 编辑用户名弹窗 ===== -->
+    <div class="modal-overlay" id="editNameModal" onclick="if(event.target.id==='editNameModal')closeUserEdit('name')">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-title">编辑用户名</div>
+            <input type="text" class="modal-input" id="editNameInput" placeholder="请输入用户名">
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeUserEdit('name')">取消</button>
+                <button class="modal-btn modal-btn-save" onclick="saveUsername()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 编辑个性签名弹窗 ===== -->
+    <div class="modal-overlay" id="editSigModal" onclick="if(event.target.id==='editSigModal')closeUserEdit('sig')">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-title">编辑个性签名</div>
+            <textarea class="modal-input modal-textarea" id="editSigInput" placeholder="请输入个性签名"></textarea>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeUserEdit('sig')">取消</button>
+                <button class="modal-btn modal-btn-save" onclick="saveSignature()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 新建歌单弹窗 ===== -->
+    <div class="modal-overlay" id="createPlaylistModal" onclick="if(event.target.id==='createPlaylistModal')closeCreatePlaylistModal()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-title">新建歌单</div>
+            <div class="modal-group">
+                <label class="modal-label">歌单封面（可选）</label>
+                <div class="cover-upload" id="newCoverUpload" onclick="changeNewCover()">
+                    <img src="" id="newCoverImg" alt="封面">
+                    <div class="upload-text">点击上传封面</div>
+                </div>
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">歌单名称</label>
+                <input type="text" class="modal-input" id="newTitleInput" placeholder="请输入歌单名称">
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">歌单介绍（可选）</label>
+                <textarea class="modal-input modal-textarea" id="newDescInput" placeholder="请输入歌单介绍"></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeCreatePlaylistModal()">取消</button>
+                <button class="modal-btn modal-btn-save" onclick="saveNewPlaylist()">创建</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 编辑歌单弹窗 ===== -->
+    <div class="modal-overlay" id="editPlaylistModal" onclick="if(event.target.id==='editPlaylistModal')closeEditPlaylistModal()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-title">编辑歌单</div>
+            <div class="modal-group">
+                <label class="modal-label">歌单封面</label>
+                <div class="cover-upload" id="editCoverUpload" onclick="changeEditCover()">
+                    <img src="" id="editCoverImg" alt="封面">
+                    <div class="upload-text">点击上传封面</div>
+                </div>
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">歌单名称</label>
+                <input type="text" class="modal-input" id="editTitleInput" placeholder="请输入歌单名称">
+            </div>
+            <div class="modal-group">
+                <label class="modal-label">歌单介绍</label>
+                <textarea class="modal-input modal-textarea" id="editDescInput" placeholder="请输入歌单介绍"></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeEditPlaylistModal()">取消</button>
+                <button class="modal-btn" style="background:#ffcccc;color:#8b4545;" onclick="deletePlaylist()">删除</button>
+                <button class="modal-btn modal-btn-save" onclick="saveEditPlaylist()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 裁剪弹窗 ===== -->
+    <div class="crop-modal" id="cropModal">
+        <div class="crop-container">
+            <h3 class="crop-title">裁剪图片</h3>
+            <div class="crop-image-wrapper">
+                <img id="cropImage" src="" alt="待裁剪图片">
+            </div>
+            <div class="crop-buttons">
+                <button class="crop-btn crop-btn-cancel" onclick="closeCrop()">取消</button>
+                <button class="crop-btn crop-btn-confirm" onclick="confirmCrop()">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 隐藏文件上传 ===== -->
+    <input type="file" id="imageUpload" accept="image/*" style="display:none;">
+    <input type="file" id="musicUpload" accept="audio/*" multiple style="display:none;">
+    <input type="file" id="lrcUpload" accept=".lrc" style="display:none;">
+    <input type="file" id="coverUpload" accept="image/*" style="display:none;">
+    <input type="file" id="avatarUpload" accept="image/*" style="display:none;">
+    </div>
+    
+    <div id="app-theme" style="display:none;">
+        <p style="text-align:center; margin-top:50px; color:#8b7355;">美化功能尚未开发</p>
+    </div>
+    
+</div>
+   
+
+<script src="js/app-settings.js"></script>
+<script src="js/homescreen.js"></script>
+<script src="https://unpkg.com/cropperjs@1.6.1/dist/cropper.js"></script>
+<script src="js/app-music.js"></script>
+
+</body>
+</html>
+
+   

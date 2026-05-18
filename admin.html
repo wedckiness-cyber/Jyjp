@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>锦玉小手机 - 资格码管理</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #f5f1e8;
+            font-family: 'Microsoft YaHei', sans-serif;
+            color: #5d4c3c;
+            padding: 40px 20px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .admin-box {
+            width: 100%; max-width: 500px;
+            background: #fff; padding: 30px;
+            border-radius: 20px; border: 1px solid #e0d6c2;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+        h1 { font-size: 24px; margin-bottom: 10px; color: #8b7355; text-align: center; }
+        .stats {
+            background: #f9f7f2; padding: 15px; border-radius: 12px;
+            margin-bottom: 25px; text-align: center;
+            border: 1px dashed #d4c4a6;
+        }
+        .stats span { font-size: 20px; font-weight: bold; color: #8b7355; }
+        
+        .btn-generate {
+            width: 100%; padding: 15px;
+            background: linear-gradient(135deg, #8b7355, #a38d6d);
+            color: white; border: none; border-radius: 12px;
+            font-size: 16px; cursor: pointer; transition: 0.3s;
+            margin-bottom: 20px;
+        }
+        .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(139,115,85,0.3); }
+
+        .list-title { font-size: 14px; color: #a38d6d; margin-bottom: 10px; padding-left: 5px; }
+        #codeListContainer {
+            max-height: 300px; overflow-y: auto;
+            border: 1px solid #f0ebe1; border-radius: 10px;
+        }
+        .code-item {
+            padding: 12px; border-bottom: 1px solid #fcfaf6;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .code-item:last-child { border-bottom: none; }
+        .code-text { font-family: monospace; font-size: 14px; font-weight: bold; }
+        .btn-copy {
+            padding: 5px 12px; background: #f0ebe1; color: #8b7355;
+            border: none; border-radius: 6px; font-size: 12px; cursor: pointer;
+        }
+        .btn-copy:hover { background: #e8e0d0; }
+
+        .footer { margin-top: 20px; font-size: 12px; color: #a38d6d; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-box">
+        <h1>资格码发放中心</h1>
+        <p style="text-align:center; font-size:12px; margin-bottom:20px; color:#a38d6d;">锦玉小手机 · 管理后台</p>
+
+        <div class="stats">
+            当前共有 <span id="totalCodes">0</span> 个资格码
+        </div>
+
+        <button class="btn-generate" onclick="generateCodes()">🚀 快速生成 5 个新资格码</button>
+
+        <div class="list-title">📋 资格码列表（最新在最前）</div>
+        <div id="codeListContainer">
+            <!-- 这里由 admin.js 填充内容 -->
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2024 锦玉小手机 · 数据保存在本地浏览器
+    </div>
+
+    <!-- 🌟 核心：引用刚才改好的 admin.js -->
+    <script src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>锦玉小手机 - 资格验证</title>
+    <style>
+
+    * { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    outline: none; 
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;}
+
+
+        /* 🌟 核心：强制楷体 */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'STKaiti', '楷体', serif; }
+        
+        body {
+            background: #f5f0e6; /* 统一的米色底 */
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px; overflow: hidden;
+        }
+
+        .auth-container {
+            width: 100%; max-width: 360px;
+            background: #fffef5;
+            padding: 40px 25px;
+            border-radius: 25px;
+            border: 1px solid #d4c4a6;
+            box-shadow: 0 15px 40px rgba(139, 115, 85, 0.15);
+            text-align: center;
+            position: relative;
+        }
+
+        h1 { font-size: 32px; color: #8b7355; letter-spacing: 5px; margin-bottom: 10px; }
+        p { font-size: 14px; color: #a38d6d; margin-bottom: 30px; letter-spacing: 1px; }
+
+        /* 状态条 */
+        .info-bar {
+            background: #f9f7f2; padding: 12px; border-radius: 12px;
+            margin-bottom: 25px; border: 1px dashed #e0d6c2;
+            font-size: 12px; color: #8b7355;
+        }
+
+        /* 🌟 输入框美化 */
+        .code-input {
+            width: 100%; padding: 18px;
+            background: #fdfaf0; border: 2px solid #e0d6c2;
+            border-radius: 15px; font-size: 18px; text-align: center;
+            color: #4a3c32; letter-spacing: 2px; outline: none;
+            transition: all 0.3s;
+        }
+        .code-input:focus { border-color: #8b7355; box-shadow: 0 0 10px rgba(139, 115, 85, 0.1); }
+
+        /* 验证按钮 */
+        .btn-verify {
+            width: 100%; padding: 16px; margin-top: 25px;
+            background: linear-gradient(135deg, #8b7355, #a38d6d);
+            color: white; border: none; border-radius: 15px;
+            font-size: 16px; cursor: pointer; transition: 0.3s;
+            letter-spacing: 4px;
+        }
+        .btn-verify:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(139, 115, 85, 0.3); }
+
+        /* 🌟 自定义古风弹窗（取代系统提示） */
+        #classicAlert {
+            position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+            width: 90%; background: #fdfaf0; border: 1px solid #d4c4a6;
+            padding: 12px; border-radius: 10px; color: #8b7355;
+            font-size: 14px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            display: none; animation: slideDown 0.4s forwards;
+            z-index: 1000;
+        }
+        @keyframes slideDown { from { top: -60px; opacity: 0; } to { top: 20px; opacity: 1; } }
+
+        .footer { position: fixed; bottom: 30px; font-size: 12px; color: #8b7355; opacity: 0.6; }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <!-- 🌟 自定义提示框 -->
+        <div id="classicAlert"></div>
+
+        <h1>锦玉小手机</h1>
+        <p>—— 请 输 入 资 格 碼 开启 ——</p>
+
+        <div class="info-bar">
+            设备指纹: <span id="deviceId">正在生成...</span>
+        </div>
+
+        <input type="text" id="qualificationCode" class="code-input" placeholder="输入 16 位验证码" autocomplete="off">
+        
+        <button class="btn-verify" id="verifyBtn">验 证 资 格</button>
+
+        <div style="margin-top: 30px; font-size: 12px; color: #a38d6d; line-height: 2;">
+            💡 测试码: JY2024-ABCD-1234<br>
+            <span style="cursor:pointer; text-decoration:underline" onclick="skip()">[ 开发测试：直接进入 ]</span>
+        </div>
+    </div>
+
+    <!-- 🌟 2026 载版权 -->
+    <div class="footer">
+        © 二零二六载 锦玉小手机 · 一机一码安全验证
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        function skip() {
+            localStorage.setItem('jy_is_verified', 'true');
+            window.location.href = 'book.html';
+        }
+    </script>
+</body>
+</html>

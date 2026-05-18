@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>锦玉书 - 灵动挂坠版</title>
+    <style>
+
+    /* 去掉所有点击时的蓝色框框 */
+    * {
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-user-select: none;  /* 防止长按选中文字 */
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+    
+    /* 去掉按钮点击时的默认样式 */
+    button, a, div {
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        -webkit-touch-callout: none;  /* 防止长按弹出菜单 */
+    }
+
+
+
+    * {
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    outline: none; 
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;}
+
+        body { background: #e6dec1; height: 100vh; display: flex; justify-content: center; align-items: center; font-family: 'STKaiti', '楷体', serif; overflow: hidden; }
+        
+        .book-container { perspective: 3000px; position: relative; display: flex; align-items: center; }
+
+        .book { width: 300px; height: 420px; position: relative; transform-style: preserve-3d; transform: rotateX(10deg) rotateY(-5deg); transition: transform 1s ease; }
+        .binding-base { position: absolute; right: 0; top: 0; width: 45px; height: 100%; background: #d4c4a6; z-index: 200; border-radius: 0 5px 5px 0; box-shadow: inset 2px 0 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: space-around; align-items: center; padding: 22px 0; border-left: 1px solid rgba(0,0,0,0.05); }
+        .stitch { width: 22px; height: 2px; background: #fff; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        .back-cover { position: absolute; width: 100%; height: 100%; background: #fdfaf0; border-right: 45px solid #d4c4a6; border-radius: 5px; transform: translateZ(-30px); z-index: 1; box-shadow: -15px 15px 40px rgba(0,0,0,0.2); }
+        .inner-pages { position: absolute; width: 255px; height: 100%; right: 45px; top: 0; background: #fffef5; transform: translateZ(-15px); z-index: 50; padding: 15px; display: flex; flex-direction: column; align-items: center; box-shadow: inset 10px 0 20px rgba(0,0,0,0.02); }
+        .ipad-placeholder { width: 165px; height: 315px; background: #000; border-radius: 15px; border: 8px solid #1a1a1a; margin-top: 15px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 40px #000; }
+        .ink-layer { position: absolute; width: 150px; height: 150px; background: radial-gradient(circle, rgba(76, 175, 80, 0.12) 0%, transparent 70%); filter: blur(15px); animation: inkFlow 15s infinite alternate ease-in-out; }
+        @keyframes inkFlow { 0% { transform: scale(1) translate(-10%, -10%); } 100% { transform: scale(1.4) translate(15%, 20%); } }
+        .inner-content { opacity: 0; transition: opacity 0.5s ease 0.8s; text-align: center; }
+        .book.open .inner-content { opacity: 1; }
+        .front-cover { position: absolute; width: 255px; height: 100%; right: 45px; top: 0; background: #fdfaf0; background-image: url('https://www.transparenttextures.com/patterns/handmade-paper.png'); border: 1px solid #e0d6c2; border-radius: 8px 0 0 8px; z-index: 100; cursor: pointer; transform-origin: right center; transition: transform 1.4s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: -5px 5px 15px rgba(0,0,0,0.1); }
+        .title-strip { background: #fff; padding: 18px 8px; border: 1px solid #eee; writing-mode: vertical-rl; letter-spacing: 8px; font-size: 20px; color: #333; box-shadow: 2px 2px 10px rgba(0,0,0,0.05); position: relative; top: -10px; }
+        .book.open .front-cover { transform: rotateY(150deg); }
+        #closeBtn { position: absolute; bottom: 20px; padding: 5px 15px; background: rgba(212, 196, 166, 0.3); border: 1px solid #d4c4a6; border-radius: 15px; color: #8b7355; font-size: 10px; cursor: pointer; transition: 0.3s; opacity: 0; pointer-events: none; }
+        .book.open #closeBtn { opacity: 1; pointer-events: auto; }
+        #finalAbsoluteTrigger { position: fixed; width: 165px; height: 315px; top: 50%; left: 50%; transform: translate(-105%, -45%); z-index: 500; cursor: pointer; display: none; }
+        .flying-mode { position: fixed !important; top: 50% !important; left: 50% !important; width: 320px; height: 711px; transform: translate(-50%, -50%) scale(1) !important; transition: all 0.8s ease; background: #000; z-index: 10000 !important; border-radius: 40px; }
+
+        /* 🌟 灵动挂坠（小花） - 在书本左边 */
+        .charm-wrapper {
+            position: absolute; 
+            left: -55px; 
+            top: 40px;
+            z-index: 300; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+        }
+        
+        .cat-charm {
+            position: relative;
+            width: 45px; 
+            height: 45px;
+            cursor: pointer;
+            animation: charmFloat 3s ease-in-out infinite;
+        }
+
+        /* 花瓣 */
+        .cat-charm .petal {
+            position: absolute;
+            width: 14px;
+            height: 18px;
+            background: radial-gradient(ellipse at 50% 100%, #FFFFFF 0%, #FFFBF0 25%, #FFF8E7 50%, #F5E6D3 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            transform-origin: bottom center;
+            top: 13.5px;
+            left: 15.5px;
+        }
+
+        /* 五片花瓣均匀排列 */
+        .cat-charm .petal:nth-child(1) { transform: rotate(0deg) translateY(-1px); }
+        .cat-charm .petal:nth-child(2) { transform: rotate(72deg) translateY(-1px); }
+        .cat-charm .petal:nth-child(3) { transform: rotate(144deg) translateY(-1px); }
+        .cat-charm .petal:nth-child(4) { transform: rotate(216deg) translateY(-1px); }
+        .cat-charm .petal:nth-child(5) { transform: rotate(288deg) translateY(-1px); }
+
+        @keyframes charmFloat {
+            0%, 100% { transform: translateY(0) rotate(5deg); }
+            50% { transform: translateY(-10px) rotate(-5deg); }
+        }
+
+        /* 🌟 胶囊菜单 */
+        .charm-menu {
+            position: absolute; 
+            top: 55px; 
+            left: 0;
+            background: #fdfaf0; 
+            border: 1px solid #d4c4a6;
+            border-radius: 30px; 
+            padding: 10px 15px;
+            display: none; 
+            flex-direction: column; 
+            gap: 8px;
+            box-shadow: 0 10px 25px rgba(139, 115, 85, 0.2);
+            animation: menuPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 100px; 
+            text-align: center;
+        }
+        @keyframes menuPop { from { opacity: 0; transform: scale(0.5) translateY(-20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+        .menu-item { font-size: 12px; color: #8b7355; cursor: pointer; padding: 5px 0; transition: 0.2s; }
+        .menu-item:hover { color: #4a3c32; font-weight: bold; }
+        .menu-divider { width: 80%; height: 1px; background: rgba(212, 196, 166, 0.4); margin: 0 auto; }
+
+        /* 栀子花音乐按钮 - 固定定位，永远在最上层 */
+        .music-flower {
+            position: fixed;
+            top: calc(50vh - 250px);
+            left: calc(50vw - 150px);
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            z-index: 999999;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.5s ease 0.8s;
+        }
+
+        .book.open ~ * .music-flower,
+        body.book-opened .music-flower {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .music-flower:hover {
+            transform: scale(1.1) rotate(15deg);
+        }
+
+        .music-flower.playing {
+            animation: spin 3s linear infinite;
+        }
+
+        @keyframes spin {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-8deg); }
+            75% { transform: rotate(8deg); }
+        }
+
+        .gardenia {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .gardenia .petal {
+            position: absolute;
+            width: 18px;
+            height: 28px;
+            background: radial-gradient(ellipse at center, #fff 0%, #f0ebe1 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            transform-origin: 9px 28px;
+            top: 11px;
+            left: 16px;
+        }
+
+        .gardenia .petal:nth-child(1) { transform: rotate(0deg); }
+        .gardenia .petal:nth-child(2) { transform: rotate(60deg); }
+        .gardenia .petal:nth-child(3) { transform: rotate(120deg); }
+        .gardenia .petal:nth-child(4) { transform: rotate(180deg); }
+        .gardenia .petal:nth-child(5) { transform: rotate(240deg); }
+        .gardenia .petal:nth-child(6) { transform: rotate(300deg); }
+    </style>
+</head>
+<body>
+    <div id="finalAbsoluteTrigger"></div>
+
+    <audio id="bgMusic1" preload="auto">
+        <source src="assets/sounds/music1.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="bgMusic2" preload="auto">
+        <source src="assets/sounds/music2.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="bgMusic3" preload="auto">
+        <source src="assets/sounds/music3.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 栀子花：放在最外层，fixed定位 -->
+    <div class="music-flower" id="musicFlower">
+        <div class="gardenia">
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+        </div>
+    </div>
+
+    <div class="book-container">
+        <!-- 🌟 灵动挂坠（小花） - 在书本左边 -->
+        <div class="charm-wrapper">
+            <div class="cat-charm" id="mainCharm">
+                <div class="petal"></div>
+                <div class="petal"></div>
+                <div class="petal"></div>
+                <div class="petal"></div>
+                <div class="petal"></div>
+            </div>
+            <div class="charm-menu" id="charmMenu">
+                <div class="menu-item" id="btnDemo">演示模式</div>
+                <div class="menu-divider"></div>
+                <div class="menu-item" id="btnSkip" style="display:none;">快捷進入</div>
+            </div>
+        </div>
+
+        <div class="book" id="book">
+            <div class="binding-base"><div class="stitch"></div><div class="stitch"></div><div class="stitch"></div><div class="stitch"></div></div>
+            <div class="back-cover"></div>
+            <div class="page inner-pages">
+                <div class="inner-content">
+                    <p style="color:#8b7355; font-size: 12px; margin-bottom: 5px;">—— 锦玉遗珍 ——</p>
+                    <div class="ipad-placeholder" id="ipadVisual">
+                        <div class="ink-layer"></div>
+                        <div style="position:relative; z-index:10; color:rgba(76, 175, 80, 0.6); font-size:10px; letter-spacing:2px;">点 击 唤 醒</div>
+                    </div>
+                </div>
+            </div>
+            <div class="page front-cover" id="cover">
+                <div class="title-strip">锦玉遇你</div>
+                <p style="margin-top: 20px; opacity: 0.3; font-size: 10px;">乙巳年·春</p>
+                <div id="closeBtn">↩ 合上</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const book = document.getElementById('book');
+        const cover = document.getElementById('cover');
+        const trigger = document.getElementById('finalAbsoluteTrigger');
+        const ipadVisual = document.getElementById('ipadVisual');
+        const mainCharm = document.getElementById('mainCharm');
+        const charmMenu = document.getElementById('charmMenu');
+        const btnSkip = document.getElementById('btnSkip');
+        const musicFlower = document.getElementById('musicFlower');
+
+        mainCharm.onclick = (e) => {
+            e.stopPropagation();
+            const isOpen = charmMenu.style.display === 'flex';
+            charmMenu.style.display = isOpen ? 'none' : 'flex';
+        };
+        document.addEventListener('click', () => charmMenu.style.display = 'none');
+
+        if (localStorage.getItem('has_seen_animation') === 'true') {
+            btnSkip.style.display = 'block';
+        }
+
+        document.getElementById('btnDemo').onclick = () => { localStorage.removeItem('jy_is_verified'); window.location.href = 'auth.html'; };
+        btnSkip.onclick = () => window.location.href = 'homescreen.html';
+
+        cover.onclick = (e) => {
+            if (!book.classList.contains('open')) {
+                book.classList.add('open');
+                document.body.classList.add('book-opened');
+                localStorage.setItem('has_seen_animation', 'true');
+                btnSkip.style.display = 'block';
+                setTimeout(() => { if (book.classList.contains('open')) trigger.style.display = 'block'; }, 1200);
+            }
+        };
+        
+               document.getElementById('closeBtn').onclick = (e) => { 
+            e.stopPropagation(); 
+            book.classList.remove('open'); 
+            document.body.classList.remove('book-opened');
+            trigger.style.display = 'none'; 
+        };
+        
+        trigger.onclick = (e) => { 
+            e.stopPropagation(); 
+            ipadVisual.classList.add('flying-mode'); 
+            book.style.opacity = "0"; 
+            setTimeout(() => { window.location.href = 'homescreen.html'; }, 800); 
+        };
+
+        // 🌸 音乐播放逻辑
+        const bgMusics = [
+            document.getElementById('bgMusic1'),
+            document.getElementById('bgMusic2'),
+            document.getElementById('bgMusic3')
+        ];
+        let currentMusic = null;
+        let isPlaying = false;
+
+        musicFlower.addEventListener('click', function(e) {
+            e.stopPropagation();
+            console.log("🌸 栀子花被点击");
+            
+            if (isPlaying && currentMusic) {
+                currentMusic.pause();
+                musicFlower.classList.remove('playing');
+                isPlaying = false;
+                console.log("🎵 音乐已暂停");
+            } else {
+                const availableMusics = bgMusics.filter(m => m !== null);
+                console.log("🎵 可用音乐数量:", availableMusics.length);
+                
+                if (availableMusics.length === 0) {
+                    console.error("❌ 没有找到音频文件");
+                    return;
+                }
+                
+                currentMusic = availableMusics[Math.floor(Math.random() * availableMusics.length)];
+                currentMusic.volume = 0.3;
+                currentMusic.currentTime = 0;
+                
+                currentMusic.play()
+                    .then(() => {
+                        console.log("✅ 音乐开始播放");
+                        musicFlower.classList.add('playing');
+                        isPlaying = true;
+                    })
+                    .catch((err) => {
+                        console.error("❌ 播放失败:", err);
+                    });
+                
+                currentMusic.onended = function() {
+                    musicFlower.classList.remove('playing');
+                    isPlaying = false;
+                    console.log("🎵 音乐播放结束");
+                };
+            }
+        });
+    </script>
+
+</body>
+</html>
