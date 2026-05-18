@@ -1,0 +1,405 @@
+/* styles.css - 锦玉小手机书本动画样式 */
+
+/* 基础重置 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, #f5f1e8 0%, #e8e0d0 100%);
+    font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    perspective: 1200px;
+}
+
+/* 书本容器 */
+.book-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 书本主体 - 修改为小米14比例 (20:9) */
+.book {
+    position: relative;
+    width: 300px;
+    height: 675px; /* 300 * (20/9) ≈ 666.67，调整为675提供一些边距 */
+    aspect-ratio: 20/9;
+    transform-style: preserve-3d;
+    transition: transform 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    cursor: pointer;
+    z-index: 10;
+}
+
+/* 书本闭合状态 */
+.book-closed {
+    transform: rotateY(0deg);
+}
+
+/* 书本打开状态 */
+.book-opened {
+    transform: rotateY(-180deg);
+}
+
+/* 书页层（封面、内页、封底） */
+.page-layer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #f8f4e9;
+    border-radius: 4px 12px 12px 4px;
+    box-shadow: 
+        inset 0 0 30px rgba(0, 0, 0, 0.05),
+        0 5px 20px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(139, 115, 85, 0.1);
+    backface-visibility: hidden;
+    overflow: hidden;
+}
+
+/* 封面 */
+.cover {
+    background: linear-gradient(135deg, #a38d6d 0%, #8b7355 100%);
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    padding: 30px;
+}
+
+.cover::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+}
+
+.cover::after {
+    content: '锦';
+    position: absolute;
+    top: 50%;
+    right: 30px;
+    transform: translateY(-50%);
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: '楷体', 'STKaiti', serif;
+}
+
+.cover h1 {
+    font-size: 28px;
+    font-weight: 300;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.cover p {
+    font-size: 14px;
+    opacity: 0.9;
+    max-width: 200px;
+    line-height: 1.6;
+}
+
+/* 线装书效果 */
+.book-spine {
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 80%;
+    background: linear-gradient(to right, #6b5a43 0%, #8b7355 50%, #6b5a43 100%);
+    border-radius: 8px;
+    box-shadow: 
+        inset 0 0 10px rgba(0, 0, 0, 0.3),
+        2px 0 5px rgba(0, 0, 0, 0.2);
+    z-index: 4;
+}
+
+.stitch {
+    position: absolute;
+    left: -4px;
+    width: 8px;
+    height: 4px;
+    background: #d4c19c;
+    border-radius: 2px;
+}
+
+.stitch:nth-child(1) { top: 20%; }
+.stitch:nth-child(2) { top: 40%; }
+.stitch:nth-child(3) { top: 60%; }
+.stitch:nth-child(4) { top: 80%; }
+
+/* 内页 */
+.content {
+    background: #f8f4e9;
+    z-index: 2;
+    transform: rotateY(180deg);
+    padding: 30px 20px; /* 减少内边距 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between; /* 上下分布内容 */
+    height: 100%;
+}
+
+.content-text {
+    width: 100%;
+    max-width: 220px;
+    margin-top: 20px; /* 上边距 */
+    margin-bottom: 10px; /* 减少下边距 */
+}
+
+/* 添加iPad区域容器，控制位置 */
+.ipad-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 30px;
+    min-height: 300px; /* 确保有足够空间 */
+}
+
+.content-text h2 {
+    font-size: 20px;
+    color: #5d4c3c;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.content-text p {
+    font-size: 14px;
+    color: #8b7355;
+    line-height: 1.8;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+
+/* iPad区域 */
+.ipad-area {
+    width: 240px;
+    height: 540px;
+    aspect-ratio: 20/9;
+    background: rgba(139, 115, 85, 0.05); /* 改为更明显的颜色 */
+    border-radius: 12px;
+    display: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid rgba(139, 115, 85, 0.4); /* 改为实线，更明显 */
+    transition: all 0.3s;
+    /* 添加这些属性确保可点击性 */
+    pointer-events: auto;
+    z-index: 10;
+    margin: 20px auto; /* 添加上下间距 */
+}
+
+.ipad-area:hover {
+    border-color: rgba(139, 115, 85, 0.6);
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.ipad-area::before {
+    content: '📱 点击开启小手机';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #8b7355;
+    font-size: 16px;
+    font-weight: bold; /* 加粗 */
+    text-align: center;
+    white-space: nowrap;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* iPad设备 */
+.ipad {
+    position: absolute;
+    width: 240px;
+    height: 540px;
+    aspect-ratio: 20/9;
+    background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+    border-radius: 24px;
+    display: none;
+    z-index: 15; /* 提高z-index确保在最上层 */
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+        inset 0 0 30px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    /* 关键修改：向上移动，创建内嵌效果 */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9); /* 缩小一点，更像内嵌 */
+    opacity: 0;
+    border: 8px solid #1a1a1a; /* 添加黑色边框模拟设备边框 */
+}
+
+/* iPad屏幕 */
+.ipad-screen {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    padding: 30px;
+}
+
+.ipad-screen h3 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    font-weight: 300;
+}
+
+.ipad-screen p {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.loading-dots {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.loading-dots span {
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: pulse 1.4s infinite ease-in-out;
+}
+
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+/* 封底 */
+.back-cover {
+    background: linear-gradient(135deg, #f5f1e8 0%, #e8e0d0 100%);
+    z-index: 1;
+}
+
+/* 动画定义 */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { 
+        opacity: 0.4;
+        transform: scale(0.8);
+    }
+    50% { 
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+
+/* 响应式调整 */
+@media (max-width: 480px) {
+    .book {
+        width: 280px;
+        height: 630px; /* 280 * (20/9) ≈ 622.22 */
+    }
+    
+    .ipad-area, .ipad {
+        width: 220px;
+        height: 495px; /* 220 * (20/9) ≈ 488.89 */
+    }
+    
+    .content-text {
+        max-width: 220px;
+    }
+}
+
+@media (min-width: 768px) {
+    .book {
+        width: 320px;
+        height: 720px; /* 320 * (20/9) ≈ 711.11 */
+    }
+    
+    .ipad-area, .ipad {
+        width: 260px;
+        height: 585px; /* 260 * (20/9) ≈ 577.78 */
+    }
+}
+/* --- 锦玉小手机：iPad 飞行特效 --- */
+.book.open .front-cover {
+    transform: rotateY(160deg) translateZ(0);
+    pointer-events: none !important; /* 翻开后，封面不再挡住点击 */
+}
+
+.ipad-placeholder.flying {
+    position: fixed !important;
+    z-index: 9999 !important;
+    top: 50% !important;
+    left: 50% !important;
+    margin: 0 !important;
+    /* 飞向屏幕中央，放大 2.5 倍 */
+    transform: translate(-50%, -50%) perspective(1000px) rotateX(0deg) scale(2.5) !important;
+    transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 0 100px rgba(0,0,0,0.8);
+    background: #1a1a1a;
+}
+
+.book.fade-out {
+    opacity: 0.2;
+    transition: opacity 0.8s ease;
+}
+/* --- 修复遮挡：让翻开后的封面不再挡手 --- */
+.book.open .front-cover {
+    transform: rotateY(160deg) translateZ(0);
+    pointer-events: none !important; /* 核心：书翻开后，封面就不拦着手了 */
+}
+
+/* 确保 iPad 永远在最上层，可以被点到 */
+.ipad-placeholder {
+    pointer-events: auto !important;
+    z-index: 100;
+}

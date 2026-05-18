@@ -1,0 +1,530 @@
+/* ========== 设置应用样式 ========== */
+
+/* 手机外壳（如果是独立页面用） */
+.phone-frame {
+    width: 320px;
+    height: 711px;
+    background: #000;
+    border-radius: 40px;
+    box-shadow: 0 0 0 10px #000, 0 30px 60px rgba(0,0,0,0.5);
+    overflow: hidden;
+    position: relative;
+    transition: all 0.3s;
+}
+
+.phone-screen {
+    width: 100%;
+    height: 100%;
+    background: #f5f1e8;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding-top: 40px;
+    position: relative;
+    box-sizing: border-box;
+}
+
+/* 顶部标题栏 */
+.settings-header {
+    width: 100%;
+    height: 50px;
+    background: rgba(253, 250, 240, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 0 15px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    border-bottom: 0.5px solid rgba(212, 196, 166, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+/* 栀子花返回按钮 */
+.settings-back-btn {
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: 0.2s;
+    padding: 0;
+}
+
+.settings-back-btn:hover {
+    background: rgba(139, 115, 85, 0.1);
+}
+
+.gardenia {
+    position: relative;
+    width: 35px;
+    height: 35px;
+}
+
+.gardenia .petal {
+    position: absolute;
+    width: 9px;
+    height: 16px;
+    background: radial-gradient(circle at 50% 30%, #FFFCE8, #FFFFFF);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    transform-origin: bottom center;
+    top: 10px;
+    left: 13px;
+}
+
+.gardenia .petal:nth-child(1) { transform: rotate(-80deg); }
+.gardenia .petal:nth-child(2) { transform: rotate(-50deg); }
+.gardenia .petal:nth-child(3) { transform: rotate(-20deg); }
+.gardenia .petal:nth-child(4) { transform: rotate(20deg); }
+.gardenia .petal:nth-child(5) { transform: rotate(50deg); }
+
+.settings-back-btn:hover .gardenia {
+    animation: rotate-gardenia 0.6s ease;
+}
+
+@keyframes rotate-gardenia {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-15deg); }
+}
+
+.settings-header-title {
+    flex: 1;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: #5d534a;
+    letter-spacing: 3px;
+    margin-right: 40px;
+}
+
+/* 设置容器 */
+.settings-container {
+    width: 100%;
+    padding: 15px;
+    box-sizing: border-box;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* 隐藏默认滚动条 */
+.settings-container::-webkit-scrollbar {
+    width: 12px;
+    background: transparent;
+}
+
+.settings-container::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
+/* 功能卡片 */
+.settings-card {
+    width: 100%;
+    margin: 0 0 12px 0;
+    padding: 15px;
+    box-sizing: border-box;
+    background: #FDFAF0;
+    border: 0.5px solid rgba(212, 196, 166, 0.2);
+    border-radius: 10px;
+    box-shadow: 
+        0 2px 4px rgba(139, 115, 85, 0.08),
+        0 4px 8px rgba(139, 115, 85, 0.06),
+        0 8px 16px rgba(139, 115, 85, 0.04);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background-image: 
+        linear-gradient(rgba(212,196,166,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(212,196,166,0.02) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+.settings-card.expandable:hover {
+    transform: translateY(-4px);
+    box-shadow: 
+        0 4px 8px rgba(139, 115, 85, 0.12),
+        0 8px 16px rgba(139, 115, 85, 0.08),
+        0 16px 32px rgba(139, 115, 85, 0.06);
+}
+
+.settings-card.expandable:hover .settings-seal {
+    animation: swing 0.5s ease;
+}
+
+@keyframes swing {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+    75% { transform: rotate(-3deg); }
+}
+
+/* 印章区域 */
+.settings-seal {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    background: rgba(139, 115, 85, 0.08);
+    border-radius: 50%;
+    border: 1px dashed rgba(212, 196, 166, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: rgba(139, 115, 85, 0.3);
+    transition: transform 0.3s ease;
+}
+
+/* 内容区 */
+.settings-content {
+    flex: 1;
+}
+
+.settings-title {
+    font-size: 15px;
+    color: #5d534a;
+    font-weight: 500;
+    margin-bottom: 3px;
+    letter-spacing: 1.5px;
+}
+
+.settings-desc {
+    font-size: 12px;
+    color: #8b7355;
+    opacity: 0.8;
+    letter-spacing: 0.5px;
+}
+
+/* 春兰装饰区域 */
+.settings-arrow {
+    width: 65px;
+    height: 65px;
+    min-width: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.spring-orchid {
+    position: relative;
+    width: 65px;
+    height: 65px;
+}
+
+.orchid-petal {
+    position: absolute;
+    width: 18px;
+    height: 24px;
+    background: radial-gradient(circle at 50% 20%, #E0F2D0, #FFFFFF);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    transform-origin: bottom center;
+    top: 20px;
+    left: 23.5px;
+}
+
+
+
+.orchid-petal:nth-child(1) { transform: rotate(0deg) translateY(-1px); }
+.orchid-petal:nth-child(2) { transform: rotate(72deg) translateY(-1px); }
+.orchid-petal:nth-child(3) { transform: rotate(144deg) translateY(-1px); }
+.orchid-petal:nth-child(4) { transform: rotate(216deg) translateY(-1px); }
+.orchid-petal:nth-child(5) { transform: rotate(288deg) translateY(-1px); }
+
+.settings-card:hover .spring-orchid {
+    animation: rotate-spring 0.8s ease;
+}
+
+@keyframes rotate-spring {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(20deg); }
+}
+
+/* 有开关的卡片 */
+.settings-card.has-switch {
+    cursor: default;
+}
+
+.settings-card.has-switch:hover {
+    transform: none;
+}
+
+/* 开关样式 */
+.settings-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+}
+
+.settings-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.settings-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #d4c4a6;
+    transition: 0.3s;
+    border-radius: 24px;
+}
+
+.settings-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.settings-switch input:checked + .settings-slider {
+    background-color: #8b7355;
+}
+
+.settings-switch input:checked + .settings-slider:before {
+    transform: translateX(20px);
+}
+
+/* 展开面板 */
+.settings-panel {
+    width: calc(100% - 52px);
+    margin: -5px 0 12px 52px;
+    padding: 12px;
+    box-sizing: border-box;
+    background: rgba(245, 241, 232, 0.6);
+    border-radius: 8px;
+    border-left: 2px solid #d4c4a6;
+    display: none;
+}
+
+.settings-panel.show {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.settings-panel input,
+.settings-panel select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 8px;
+    border: 1px solid #d4c4a6;
+    border-radius: 6px;
+    background: #fff;
+    font-family: 'STKaiti', '楷体', 'KaiTi', serif;
+    font-size: 13px;
+    color: #5d534a;
+    box-sizing: border-box;
+}
+
+.settings-panel button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 8px;
+    background: #8b7355;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-family: 'STKaiti', '楷体', 'KaiTi', serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+    letter-spacing: 1px;
+    box-sizing: border-box;
+}
+
+.settings-panel button:last-child {
+    margin-bottom: 0;
+}
+
+.settings-panel button:hover {
+    background: #9C8B7A;
+}
+
+.settings-panel button.danger {
+    background: #C97C5D;
+}
+
+.settings-panel button.danger:hover {
+    background: #B36B4D;
+}
+
+.settings-panel button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.settings-panel p {
+    font-size: 11px;
+    color: #8b7355;
+    margin: 5px 0 0 0;
+    text-align: center;
+}
+
+/* 回到顶部按钮 */
+.settings-scroll-top {
+    position: fixed;
+    right: 15px;
+    bottom: 20px;
+    width: 50px;
+    height: 50px;
+    background: rgba(253, 250, 240, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(139, 115, 85, 0.2);
+    z-index: 300;
+}
+
+.settings-scroll-top.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.settings-scroll-top:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(139, 115, 85, 0.3);
+}
+
+.settings-scroll-top .narcissus {
+    position: relative;
+    width: 35px;
+    height: 35px;
+}
+
+.settings-scroll-top .narcissus .petal {
+    position: absolute;
+    width: 5px;
+    height: 14px;
+    background: radial-gradient(circle at 50% 30%, #FFFCE8, #FFFFFF);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    transform-origin: bottom center;
+    top: 10px;
+    left: 15px;
+}
+
+.settings-scroll-top .narcissus .petal:nth-child(1) { transform: rotate(-30deg) translateY(-1px); }
+.settings-scroll-top .narcissus .petal:nth-child(2) { transform: rotate(-15deg) translateY(-0.5px); }
+.settings-scroll-top .narcissus .petal:nth-child(3) { transform: rotate(0deg); }
+.settings-scroll-top .narcissus .petal:nth-child(4) { transform: rotate(15deg) translateY(-0.5px); }
+.settings-scroll-top .narcissus .petal:nth-child(5) { transform: rotate(30deg) translateY(-1px); }
+.settings-scroll-top .narcissus .petal:nth-child(6) { transform: rotate(0deg) translateY(-0.5px); }
+
+/* 黑夜模式 */
+body.dark-mode .phone-screen {
+    background: #1a1a1a;
+}
+
+body.dark-mode .settings-header {
+    background: rgba(42, 42, 42, 0.95);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .settings-header-title {
+    color: #e0e0e0;
+}
+
+body.dark-mode .settings-back-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .gardenia .petal {
+    background: radial-gradient(circle at 50% 30%, #E0D8C0, #C0C0C0);
+}
+
+body.dark-mode .settings-card {
+    background: #2a2a2a;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .settings-title {
+    color: #e0e0e0;
+}
+
+body.dark-mode .settings-desc {
+    color: #b0b0b0;
+}
+
+body.dark-mode .settings-seal {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.3);
+}
+
+body.dark-mode .orchid-petal {
+    background: radial-gradient(circle at 50% 20%, #C0D8B0, #A0A0A0);
+}
+
+body.dark-mode .settings-scroll-top {
+    background: rgba(42, 42, 42, 0.9);
+}
+
+body.dark-mode .settings-scroll-top .narcissus .petal {
+    background: radial-gradient(circle at 50% 30%, #4A4A3A, #6A6A6A);
+}
+
+body.dark-mode .settings-panel {
+    background: rgba(42, 42, 42, 0.8);
+    border-left-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .settings-panel input,
+body.dark-mode .settings-panel select {
+    background: #1a1a1a;
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+}
+
+body.dark-mode .settings-panel button {
+    background: #5a5a5a;
+}
+
+body.dark-mode .settings-panel button:hover {
+    background: #6a6a6a;
+}
+
+body.dark-mode .settings-panel button.danger {
+    background: #8b4a3a;
+}
+
+body.dark-mode .settings-panel p {
+    color: #b0b0b0;
+}
+
+/* 全屏模式 */
+body.fullscreen-mode .phone-frame {
+    width: 100vw !important;
+    height: 100vh !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
